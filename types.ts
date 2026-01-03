@@ -10,6 +10,13 @@ export enum Page {
   About = 'about'
 }
 
+export enum School {
+  SHAFI = 'shafi',
+  HANAFI = 'hanafi',
+  MALIKI = 'maliki',
+  HANBALI = 'hanbali'
+}
+
 export interface HeirInput {
   husband: boolean;
   wife: number;
