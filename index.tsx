@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
 import { 
-  Scale, Moon, Sparkles, Sun, Calculator, Wallet, ArrowLeft, Plus, Minus, Info, Coins, Wheat, Beef, ChevronDown, UserX, UserCheck
+  Scale, Moon, Sparkles, Sun, Calculator, Wallet, ArrowLeft, Plus, Minus, Info, Coins, Wheat, Beef, ChevronDown, UserX, UserCheck, AlertCircle, FileText, Zap
 } from 'lucide-react';
+
+// --- UTILS ---
+const gcd = (a: number, b: number): number => b === 0 ? a : gcd(b, a % b);
+const lcm = (a: number, b: number): number => (a * b) / gcd(a, b);
+const getLCMOfArray = (arr: number[]): number => arr.reduce((acc, val) => lcm(acc, val), 1);
 
 // --- CONSTANTS ---
 const GOLD_PRICE_FIXED = 13582;
@@ -18,6 +23,11 @@ const TRANSLATIONS = {
     agriTitle: "Agriculture (Ushr)", agriWeight: "Harvest (kg)", agriType: "Irrigation", rainFed: "Rain-fed (10%)", irrigated: "Irrigated (5%)",
     livestockTitle: "Livestock", sheepGoat: "Sheep/Goat", cattle: "Cattle", festGreeting: "Welcome to the Hub", festAction: "Enter Hub",
     mahjubTitle: "Excluded Relatives (Mahjub)",
+    awlTitle: "Al-Awl (Increase) Detected",
+    awlDesc: "The total of fixed shares exceeded the original denominator. In Shafi'i Fiqh, the denominator is increased to proportionally adjust the shares.",
+    specialCaseTitle: "Special Jurisprudential Case",
+    originalAsl: "Original Base",
+    adjustedAsl: "Adjusted Base (Awl)",
     cats: { direct: "Direct Heirs", desc: "Descendants", sib: "Siblings", nephew: "Nephews", cousin: "Cousins" } 
   },
   ml: { 
@@ -27,6 +37,11 @@ const TRANSLATIONS = {
     agriTitle: "കൃഷി (ഉശ്ര്)", agriWeight: "വിളവ് (കിലോ)", agriType: "നനയ്ക്കുന്ന രീതി", rainFed: "മഴവെള്ളം (10%)", irrigated: "നനയ്ക്കുന്നത് (5%)",
     livestockTitle: "കന്നുകാലികൾ", sheepGoat: "ആടുകൾ", cattle: "പശുക്കൾ", festGreeting: "ഫിഖ്ഹ് ഹബ്ബിലേക്ക് സ്വാഗതം", festAction: "പ്രവേശിക്കുക",
     mahjubTitle: "ഹജ്ബ് ചെയ്യപ്പെട്ടവർ (Mahjub)",
+    awlTitle: "ഔൽ മസ്അല (Al-Awl)",
+    awlDesc: "ആകെ ഓഹരികൾ അടിസ്ഥാന സംഖ്യയേക്കാൾ വർദ്ധിച്ചു. അതിനാൽ ഷാഫിഈ മദ്ഹബ് പ്രകാരം അടിസ്ഥാന സംഖ്യ ഉയർത്തി ക്രമീകരിച്ചു.",
+    specialCaseTitle: "പ്രത്യേക മസ്അല (Special Case)",
+    originalAsl: "യഥാർത്ഥ അടിസ്ഥാനം",
+    adjustedAsl: "ക്രമീകരിച്ചത് (ഔൽ)",
     cats: { direct: "നേരിട്ടുള്ള ബന്ധുക്കൾ", desc: "സന്താനങ്ങൾ", sib: "സഹോദരങ്ങൾ", nephew: "സഹോദര പുത്രന്മാർ", cousin: "പിതൃസഹോദര പുത്രന്മാർ" } 
   },
   ar: { 
@@ -36,6 +51,11 @@ const TRANSLATIONS = {
     agriTitle: "الزراعة (العشر)", agriWeight: "المحصول (كجم)", agriType: "الري", rainFed: "مطر (10%)", irrigated: "سقي (5%)",
     livestockTitle: "الماشية", sheepGoat: "غنم وماعز", cattle: "بقر وجاموس", festGreeting: "أهلاً بكم في ملتقى الفقه", festAction: "دخول",
     mahjubTitle: "الورثة المحجوبون",
+    awlTitle: "مسألة العول",
+    awlDesc: "زادت السهام عن أصل المسألة، فتم رفع الأصل (العول) توزيع النقص على جميع الورثة.",
+    specialCaseTitle: "مسألة خاصة",
+    originalAsl: "أصل المسألة",
+    adjustedAsl: "العول",
     cats: { direct: "الورثة المباشرون", desc: "الفروع", sib: "الإخوة", nephew: "أبناء الإخوة", cousin: "أبناء الأعمام" } 
   }
 };
@@ -54,8 +74,8 @@ const HEIR_DATA = {
   matGrandmother: { term: "Al-Jaddah Umm", en: "Mat. Grandma", ml: "മാതാവിന്റെ മാതാവ്", ar: "الجدة لأم", rules: "Excluded by mother." },
   fullBrothers: { term: "Al-Akh Shaqiq", en: "Full Brother", ml: "സഹോദരൻ", ar: "الأخ الشقيق", rules: "Excluded by male descendants/father." },
   fullSisters: { term: "Al-Ukht Shaqiqah", en: "Full Sister", ml: "സഹോദരി", ar: "الأخت الشقيقة", rules: "Excluded by male descendants/father." },
-  patBrothers: { term: "Al-Akh Ab", en: "Pat. Brother", ml: "പിതൃ സഹോദരൻ", ar: "الأخ لأب", rules: "Excluded by full brother." },
-  patSisters: { term: "Al-Ukht Ab", en: "Pat. Sister", ml: "പിതൃ സഹോദരി", ar: "الأخت لأب", rules: "Excluded by full brother." },
+  patBrothers: { term: "Al-Akh Ab", en: "Pat. Brother", ml: "പിതൃ സഹോദരൻ", ar: "الأخ لأബ", rules: "Excluded by full brother." },
+  patSisters: { term: "Al-Ukht Ab", en: "Pat. Sister", ml: "പിതൃ സഹോദരി", ar: "الأخت لأബ", rules: "Excluded by full brother." },
   matBrothers: { term: "Al-Akh Umm", en: "Mat. Brother", ml: "മാതൃ സഹോദരൻ", ar: "الأخ لأം", rules: "Fixed 1/6 or 1/3." },
   matSisters: { term: "Al-Ukht Umm", en: "Mat. Sister", ml: "മാതൃ സഹോദരി", ar: "الأخت لأം", rules: "Fixed 1/6 or 1/3." },
   fullNephews: { term: "Ibn Akh", en: "Full Nephew", ml: "സഹോദര പുത്രൻ", ar: "ابن الأخ", rules: "Agnatic relative." },
@@ -75,49 +95,136 @@ const HEIR_DATA = {
 // --- ENGINE: CALCULATE INHERITANCE ---
 const runInheritanceEngine = (inputs, estate) => {
   const h = (id) => inputs[id] || 0;
-  let results = [];
+  let rawResults: { id: string, num: number, den: number, type: 'fixed' | 'asabah', note?: string }[] = [];
   let exclusions = [];
+  let specialCase = null;
   const addExcl = (id, blocker) => { if (h(id) > 0) exclusions.push({ id, blockedBy: HEIR_DATA[blocker].term }); };
   
   const hasDesc = (h('sons') > 0 || h('daughters') > 0 || h('grandsons') > 0 || h('granddaughters') > 0);
   const hasMaleDesc = (h('sons') > 0 || h('grandsons') > 0);
+  const sibCount = h('fullBrothers') + h('fullSisters') + h('patBrothers') + h('patSisters') + h('matBrothers') + h('matSisters');
 
+  // Basic Blocking logic
   if (h('sons') > 0) ['grandsons', 'granddaughters'].forEach(id => addExcl(id, 'sons'));
   if (h('father') > 0) ['grandfather', 'patGrandmother'].forEach(id => addExcl(id, 'father'));
   if (h('mother') > 0) ['patGrandmother', 'matGrandmother'].forEach(id => addExcl(id, 'mother'));
   if (h('father') > 0 || hasMaleDesc) ['fullBrothers', 'fullSisters', 'patBrothers', 'patSisters', 'matBrothers', 'matSisters'].forEach(s => addExcl(s, h('father') > 0 ? 'father' : 'sons'));
 
-  const asabahOrder = ['sons', 'grandsons', 'father', 'grandfather', 'fullBrothers', 'patBrothers', 'fullNephews', 'patNephews', 'fullNephewSons', 'patNephewSons', 'fullPatUncles', 'patPatUncles', 'fullCousins', 'patCousins', 'fullCousinSons', 'patCousinSons', 'fullCousinGrandsons', 'patCousinGrandsons'];
-  let topAgnate = null;
-  for (let id of asabahOrder) { if (!exclusions.find(e => e.id === id) && h(id) > 0) { topAgnate = id; break; } }
-  if (topAgnate) { asabahOrder.slice(asabahOrder.indexOf(topAgnate) + 1).forEach(id => { if (h(id) > 0 && !exclusions.find(e => e.id === id)) addExcl(id, topAgnate); }); }
+  // Al-Musharrakah (Himariyyah) Check: Shafi'i Specific
+  // Condition: Husband + Mother + 2+ Maternal Siblings + Full Brother(s)
+  const isMusharrakah = (h('husband') > 0 && h('mother') > 0 && (h('matBrothers') + h('matSisters') >= 2) && h('fullBrothers') > 0);
+
+  // Al-Gharrawayn (Umariyyatan) Check
+  // Condition: (Husband or Wife) + Mother + Father (No kids, No multiple siblings)
+  const isGharrawayn = (h('mother') > 0 && h('father') > 0 && !hasDesc && sibCount <= 1 && (h('husband') > 0 || h('wife') > 0));
 
   const active = { ...inputs }; exclusions.forEach(e => active[e.id] = 0);
-  let totalFixed = 0; const commonD = 24;
 
-  if (active.husband) { const v = hasDesc ? 6 : 12; results.push({ id: 'husband', f: hasDesc ? '1/4' : '1/2', p: (v/24)*100 }); totalFixed += v; }
-  else if (active.wife > 0) { const v = hasDesc ? 3 : 6; results.push({ id: 'wife', f: hasDesc ? '1/8' : '1/4', p: (v/24)*100 }); totalFixed += v; }
-  if (active.mother) { const v = hasDesc ? 4 : 8; results.push({ id: 'mother', f: hasDesc ? '1/6' : '1/3', p: (v/24)*100 }); totalFixed += v; }
-  if (active.father && hasMaleDesc) { results.push({ id: 'father', f: '1/6', p: (4/24)*100 }); totalFixed += 4; }
-  if (active.daughters > 0 && active.sons === 0) { const v = active.daughters === 1 ? 12 : 16; results.push({ id: 'daughters', f: active.daughters === 1 ? '1/2' : '2/3', p: (v/24)*100 }); totalFixed += v; }
+  // Step 1: Assignment
+  if (active.husband) { rawResults.push({ id: 'husband', num: 1, den: hasDesc ? 4 : 2, type: 'fixed' }); }
+  else if (active.wife > 0) { rawResults.push({ id: 'wife', num: 1, den: hasDesc ? 8 : 4, type: 'fixed' }); }
 
-  if (totalFixed > commonD) { const factor = commonD / totalFixed; results.forEach(r => r.p *= factor); }
-  let residue = Math.max(0, 100 - results.reduce((acc, r) => acc + r.p, 0));
-  if (residue > 0 && topAgnate) {
-    const partners = { 'sons':'daughters', 'grandsons':'granddaughters', 'fullBrothers':'fullSisters', 'patBrothers':'patSisters' };
-    const pId = partners[topAgnate];
-    if (pId && active[pId] > 0) {
-      const units = (active[topAgnate] * 2) + active[pId]; const val = residue / units;
-      results.push({ id: topAgnate, f: 'Asabah', p: val * 2 * active[topAgnate] });
-      results.push({ id: pId, f: 'Asabah', p: val * active[pId] });
+  if (active.mother) { 
+    if (isGharrawayn) {
+      specialCase = { name: "Al-Gharrawayn (Umariyyatan)", desc: "Mother receives 1/3 of the residue after spouse share." };
+      // Mother gets 1/3 of remainder. If husband gets 1/2, residue is 1/2. Mother gets 1/3 of 1/2 = 1/6.
+      // If wife gets 1/4, residue is 3/4. Mother gets 1/3 of 3/4 = 1/4.
+      const den = h('husband') > 0 ? 6 : 4;
+      rawResults.push({ id: 'mother', num: 1, den: den, type: 'fixed', note: "1/3 of Residue" });
     } else {
-      const existing = results.find(r => r.id === topAgnate);
-      if (existing) { existing.p += residue; existing.f += ' + Asabah'; }
-      else results.push({ id: topAgnate, f: 'Asabah', p: residue });
+      rawResults.push({ id: 'mother', num: 1, den: (hasDesc || sibCount >= 2) ? 6 : 3, type: 'fixed' }); 
     }
   }
+
+  if (active.father && hasMaleDesc) { rawResults.push({ id: 'father', num: 1, den: 6, type: 'fixed' }); }
+  
+  if (active.daughters > 0 && active.sons === 0) { 
+    rawResults.push({ id: 'daughters', num: active.daughters === 1 ? 1 : 2, den: active.daughters === 1 ? 2 : 3, type: 'fixed' }); 
+  }
+
+  // Maternal Siblings
+  if ((active.matBrothers + active.matSisters) > 0) {
+    if (isMusharrakah) {
+      specialCase = { name: "Al-Musharrakah (The Participation)", desc: "Full brothers participate in the 1/3 share of maternal siblings." };
+      rawResults.push({ id: 'matBrothers', num: 1, den: 3, type: 'fixed', note: "Shared with Full Brothers" });
+      // We'll handle the actual split in the final mapping
+    } else {
+      const count = active.matBrothers + active.matSisters;
+      rawResults.push({ id: 'matBrothers', num: count === 1 ? 1 : 1, den: count === 1 ? 6 : 3, type: 'fixed' });
+    }
+  }
+
+  // Step 2: LCM & Asl
+  const denominators = rawResults.map(r => r.den);
+  const baseAsl = denominators.length > 0 ? getLCMOfArray(denominators) : 1;
+  let totalUnits = 0;
+  rawResults.forEach(r => {
+    const units = (baseAsl / r.den) * r.num;
+    totalUnits += units;
+  });
+
+  // Step 3: Awl Detection
+  let finalAsl = baseAsl;
+  let awlOccurred = false;
+  if (totalUnits > baseAsl) {
+    awlOccurred = true;
+    finalAsl = totalUnits;
+  }
+
+  // Step 4: Asabah / Residue
+  let finalResults = rawResults.map(r => ({
+    ...r,
+    p: (((baseAsl / r.den) * r.num) / finalAsl) * 100,
+    f: `${r.num}/${r.den}`
+  }));
+
+  let residueUnits = Math.max(0, finalAsl - totalUnits);
+  
+  // Special Handling for Father as Asabah in Gharrawayn
+  if (isGharrawayn && residueUnits > 0) {
+    finalResults.push({ id: 'father', f: 'Asabah', p: (residueUnits / finalAsl) * 100, num: 0, den: 0, type: 'asabah', note: "Remaining 2/3 of residue" });
+    residueUnits = 0;
+  }
+
+  if (residueUnits > 0) {
+    const asabahOrder = ['sons', 'grandsons', 'father', 'grandfather', 'fullBrothers', 'patBrothers'];
+    let topAgnate = null;
+    for (let id of asabahOrder) { if (active[id] > 0) { topAgnate = id; break; } }
+    
+    if (topAgnate) {
+       if (isMusharrakah && topAgnate === 'fullBrothers') {
+         // Full brothers already shared in fixed part, nothing left here
+       } else {
+          const partners = { 'sons':'daughters', 'grandsons':'granddaughters', 'fullBrothers':'fullSisters', 'patBrothers':'patSisters' };
+          const pId = partners[topAgnate];
+          if (pId && active[pId] > 0) {
+            const unitsPerFemale = residueUnits / (active[topAgnate] * 2 + active[pId]);
+            finalResults.push({ id: topAgnate, f: 'Asabah', p: (unitsPerFemale * 2 * active[topAgnate] / finalAsl) * 100, num:0, den:0, type:'asabah' });
+            finalResults.push({ id: pId, f: 'Asabah', p: (unitsPerFemale * active[pId] / finalAsl) * 100, num:0, den:0, type:'asabah' });
+          } else {
+            const existing = finalResults.find(r => r.id === topAgnate);
+            if (existing) { existing.p += (residueUnits / finalAsl) * 100; existing.f += ' + Asabah'; }
+            else finalResults.push({ id: topAgnate, f: 'Asabah', p: (residueUnits / finalAsl) * 100, num:0, den:0, type:'asabah' });
+          }
+       }
+    }
+  }
+
+  // Final Cleanup for Musharrakah Display
+  if (isMusharrakah) {
+    const matPart = finalResults.find(r => r.id === 'matBrothers');
+    if (matPart) {
+      const sharedP = matPart.p;
+      const headCount = active.matBrothers + active.matSisters + active.fullBrothers;
+      matPart.p = (sharedP / headCount) * (active.matBrothers + active.matSisters);
+      finalResults.push({ id: 'fullBrothers', f: 'Shared Fixed', p: (sharedP / headCount) * active.fullBrothers, num: 0, den: 0, type: 'fixed', note: "Musharrakah Adjustment" });
+    }
+  }
+
   return { 
-    winners: results.map(r => ({ ...r, ...HEIR_DATA[r.id], amount: estate ? (r.p/100)*estate : 0 })), 
+    awl: { occurred: awlOccurred, originalAsl: baseAsl, newAsl: finalAsl },
+    specialCase,
+    winners: finalResults.map(r => ({ ...r, ...HEIR_DATA[r.id], amount: estate ? (r.p/100)*estate : 0 })), 
     losers: exclusions.map(e => ({ ...e, ...HEIR_DATA[e.id] })) 
   };
 };
@@ -258,6 +365,41 @@ const App = () => {
                    {state.estate > 0 && <span className="text-4xl font-black text-blue-400">₹{state.estate.toLocaleString()}</span>}
                 </div>
 
+                {/* SPECIAL CASE BANNER */}
+                {state.inheritanceResults.specialCase && (
+                  <div className="p-8 bg-blue-500/10 border border-blue-500/30 rounded-[2.5rem] flex items-start gap-6 animate-fade-in shadow-2xl relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-4 opacity-10 rotate-12"><Zap size={100} className="text-blue-400" /></div>
+                    <div className="p-4 bg-blue-500/20 rounded-2xl shrink-0"><Sparkles className="text-blue-400" size={32} /></div>
+                    <div className="space-y-2 relative z-10">
+                      <h4 className="text-xl font-black uppercase tracking-tight text-blue-400">{t.specialCaseTitle}</h4>
+                      <p className="text-sm font-black text-white">{state.inheritanceResults.specialCase.name}</p>
+                      <p className="text-xs text-slate-400 leading-relaxed max-w-2xl">{state.inheritanceResults.specialCase.desc}</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* AWL MASAALA DISPLAY */}
+                {state.inheritanceResults.awl.occurred && (
+                  <div className="p-8 bg-amber-500/10 border border-amber-500/30 rounded-[2.5rem] flex items-start gap-6 animate-fade-in shadow-2xl relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-4 opacity-5"><Scale size={120} /></div>
+                    <div className="p-4 bg-amber-500/20 rounded-2xl shrink-0"><AlertCircle className="text-amber-500" size={32} /></div>
+                    <div className="space-y-2 relative z-10">
+                      <h4 className="text-xl font-black uppercase tracking-tight text-amber-400">{t.awlTitle}</h4>
+                      <p className="text-xs text-slate-300 font-medium leading-relaxed max-w-2xl">{t.awlDesc}</p>
+                      <div className="flex gap-4 mt-6">
+                        <div className="px-4 py-2 bg-slate-950/50 rounded-xl border border-white/5">
+                          <div className="text-[8px] font-black text-slate-500 uppercase tracking-widest">{t.originalAsl}</div>
+                          <div className="text-xl font-black text-white">{state.inheritanceResults.awl.originalAsl}</div>
+                        </div>
+                        <div className="px-4 py-2 bg-amber-500/20 rounded-xl border border-amber-500/30">
+                          <div className="text-[8px] font-black text-amber-400 uppercase tracking-widest">{t.adjustedAsl}</div>
+                          <div className="text-xl font-black text-amber-400">{state.inheritanceResults.awl.newAsl}</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* WINNERS SECTION */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-fade-in">
                   {state.inheritanceResults.winners.map(r => (
@@ -268,11 +410,14 @@ const App = () => {
                           <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest leading-none">({r.term})</span>
                         </div>
                         <div className="text-right">
-                          <span className="text-3xl font-black text-blue-400 leading-none">{r.f}</span>
+                          <span className="text-3xl font-black text-blue-400 leading-none">{r.f !== '0/0' ? r.f : 'Asabah'}</span>
                           <div className="text-[10px] text-slate-500 font-bold uppercase mt-1">{r.p.toFixed(2)}%</div>
                         </div>
                       </div>
-                      <p className="text-[9px] text-slate-500 italic mb-6">"{r.rules}"</p>
+                      <div className="mb-4">
+                         <p className="text-[9px] text-slate-500 italic mb-2">"{r.rules}"</p>
+                         {r.note && <span className="px-2 py-0.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded text-[8px] font-black uppercase tracking-widest">{r.note}</span>}
+                      </div>
                       {state.estate > 0 && (
                         <div className="mt-auto pt-6 border-t border-white/5 flex flex-col gap-2">
                           <div className="flex justify-between items-baseline">
@@ -282,7 +427,7 @@ const App = () => {
                           {state.inheritanceInputs[r.id] > 1 && (
                             <div className="flex justify-between items-baseline">
                               <span className="text-[9px] font-black text-blue-500 uppercase">{t.perHead}:</span>
-                              <span className="text-sm font-black text-blue-400">₹{(r.amount/state.inheritanceInputs[r.id]).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                              <span className="text-sm font-black text-blue-400">₹{(r.amount/(state.inheritanceInputs[r.id] || 1)).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                             </div>
                           )}
                         </div>
@@ -305,9 +450,7 @@ const App = () => {
                               <span className="font-black text-xl text-slate-300 tracking-tighter">{r[state.lang]}</span>
                               <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest leading-none">({r.term})</span>
                             </div>
-                            <div className="p-2 bg-rose-500/10 rounded-xl">
-                              <UserX className="text-rose-500/50" size={20} />
-                            </div>
+                            <div className="p-2 bg-rose-500/10 rounded-xl"><UserX className="text-rose-500/50" size={20} /></div>
                           </div>
                           <div className="mt-auto pt-4 border-t border-white/5">
                             <span className="text-[10px] font-black text-rose-400/70 uppercase tracking-widest">{t.blockedBy}:</span>
@@ -401,5 +544,5 @@ const App = () => {
   );
 };
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 root.render(<App />);
