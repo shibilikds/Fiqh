@@ -1,135 +1,91 @@
 
 import React, { useState } from 'react';
-import ReactDOM from 'react-dom/client';
+import { createRoot } from 'react-dom/client';
 import { 
-  Scale, Moon, Sparkles, Calculator, Wallet, ArrowLeft, Plus, Minus, Coins, Wheat, Beef, UserX, UserCheck, AlertCircle, Zap, BookOpen, AlertTriangle, CheckCircle2, RefreshCcw, FileText, Languages, Layers, ChevronRight, Info, Users, User, UserPlus
+  Scale, Calculator, Wallet, ArrowLeft, Plus, Minus, UserX, UserCheck, 
+  AlertTriangle, CheckCircle2, RefreshCcw, Layers, Info, User, 
+  Zap, BookOpen, FileText, ChevronRight, Award
 } from 'lucide-react';
 
 // --- UTILS ---
 const gcd = (a: number, b: number): number => b === 0 ? a : gcd(b, a % b);
 const lcm = (a: number, b: number): number => (a * b) / gcd(a, b);
-const getLCMOfArray = (arr: number[]): number => arr.reduce((acc, val) => lcm(acc, val), 1);
+const getLCMOfArray = (arr: number[]): number => arr.length === 0 ? 1 : arr.reduce((acc, val) => lcm(acc, val), 1);
 
 // --- CONSTANTS ---
-const GOLD_PRICE_FIXED = 13582;
-const SILVER_PRICE_EST = 95;
+const GOLD_PRICE_FIXED = 6250; 
 const NISAB_GOLD = 85;
-const NISAB_AGRI_KG = 652;
 
+// --- TRANSLATIONS ---
 const TRANSLATIONS: any = {
   en: { 
-    title: "Fiqh Hub", subtitle: "Shāfiʿī Jurisprudence Platform", home: "Home", inheritance: "Inheritance", zakath: "Zakah", faraid: "Fara'id", back: "Back", calculate: "Calculate", 
-    estateValue: "Total Estate Value (INR)", estateTotal: "Estate Total", runEngine: "Run Engine", wajib: "Wajib (Payable)", exempt: "Exempt", share: "Share", perHead: "Per Individual", 
-    blockedBy: "Blocked By", mahjub: "Mahjub", cashSavings: "Cash & Savings", goldWeight: "Gold Weight (g)", businessStock: "Trade Assets", silverWeight: "Silver (g)",
-    agriTitle: "Agriculture (Ushr)", agriWeight: "Harvest (kg)", agriType: "Irrigation", rainFed: "Rain-fed (10%)", irrigated: "Irrigated (5%)",
-    livestockTitle: "Livestock", sheepGoat: "Sheep/Goat", cattle: "Cattle", festGreeting: "Welcome to the Hub", festAction: "Enter Hub",
-    mahjubTitle: "Excluded Relatives (Mahjub)",
-    awlTitle: "Al-Awl (Increase) Detected",
-    awlDesc: "The total of fixed shares exceeded the original denominator. Shares are proportionally reduced. Affected heirs are highlighted in Purple.",
-    specialCaseTitle: "Special Jurisprudential Case",
-    originalAsl: "Original Base",
-    adjustedAsl: "Adjusted Base (Awl)",
-    jabarTitle: "Jabar Masaala (Al-Jabariyyah)",
-    jabarDesc: "The male relative compelled the female to become a residuary (Asabah) instead of having a fixed share. These heirs are highlighted in Amber below.",
-    doubleCheckTitle: "Critical Verification",
-    doubleCheckMsg: "Inheritance calculations are extremely sensitive in Fiqh. Please double-check the potential heir counts and the total estate. Are you sure you wish to continue?",
-    confirmBtn: "Yes, Generate Results",
-    cancelBtn: "No, Go Back",
-    detailedSummary: "Detailed Methodology",
-    methodologyDesc: "Breakdown of the Fiqh logic used for this specific case:",
-    jabarTag: "Jabar Logic",
-    awlTag: "Awl Adjusted",
-    blockerTag: "Blocker (Hajib)",
-    deceasedGender: "Gender of Deceased",
-    male: "Male",
-    female: "Female",
-    maxLimit: "Limit Reached",
+    title: "Fiqh Hub", subtitle: "Shāfiʿī Jurisprudence Platform", home: "Home", inheritance: "Inheritance", zakath: "Zakah", 
+    back: "Back", calculate: "Calculate", estateValue: "Total Estate Value (INR)", runEngine: "Run Engine", 
+    share: "Share", perHead: "Per Individual", blockedBy: "Blocked By", mahjub: "Mahjub", 
+    cashSavings: "Cash & Savings", goldWeight: "Gold Weight (g)", businessStock: "Trade Assets",
+    mahjubTitle: "Excluded Relatives (Mahjub)", awlTitle: "Al-Awl (Increase) Detected",
+    awlDesc: "Total shares exceeded the base. Fractions are proportionally reduced. Affected heirs highlighted in Purple.",
+    jabarTitle: "Jabar Case Detected", jabarDesc: "Male relative forced female into residue (Asabah) instead of her fixed share. Highlighted in Amber.",
+    doubleCheckTitle: "Confirm Data", doubleCheckMsg: "Please verify all heir counts and the total estate before generating the final Shāfiʿī report.",
+    confirmBtn: "Generate Results", cancelBtn: "Cancel", deceasedGender: "Deceased Gender",
+    male: "Male", female: "Female", maxLimit: "Max Limit",
+    detailedSummary: "Jurisprudential Methodology", methodologyDesc: "Breakdown of the Fiqh logic used for this specific case:",
+    jabarTag: "Jabar Logic", awlTag: "Awl Adjusted", asabahTag: "Asabah", fixedTag: "Dhu al-Furud",
     cats: { 
-      primary: "Primary Heirs",
-      descendants: "Descendants", 
-      ancestors: "Ancestors",
-      siblings: "Siblings", 
-      nephews: "Nephews", 
-      uncles: "Paternal Uncles",
-      cousins: "Cousins" 
+      primary: "Primary Heirs", descendants: "Descendants", ancestors: "Ancestors", 
+      siblings: "Siblings", nephews: "Nephews", uncles: "Uncles", cousins: "Cousins" 
     } 
   },
   ml: { 
-    title: "ഫിഖ്ഹ് ഹബ്", subtitle: "ഷാഫിഈ കർമ്മശാസ്ത്രം", home: "ഹോം", inheritance: "അനന്തരാവകാശം", zakath: "സകാത്ത്", faraid: "ഫറാഇദ്", back: "പിന്നിലേക്ക്", calculate: "കണക്കാക്കുക", 
-    estateValue: "സ്വത്ത് മൂല്യം", estateTotal: "ആകെ സ്വത്ത്", runEngine: "കണക്കുകൂട്ടുക", wajib: "നിർബന്ധം (വാജിബ്)", exempt: "നിസാബ് തികഞ്ഞില്ല", share: "വിഹിതം", perHead: "ഒരാൾക്ക്", 
-    blockedBy: "തടഞ്ഞത്", mahjub: "ഹജ്ബ്", cashSavings: "പണം & നിക്ഷേപം", goldWeight: "സ്വർണ്ണം (ഗ്രാം)", businessStock: "ബിസിനസ്സ് സ്റ്റോക്ക്", silverWeight: "വെള്ളി (ഗ്രാം)",
-    agriTitle: "കൃഷി (ഉശ്ര്)", agriWeight: "വിളവ് (കിലോ)", agriType: "നനയ്ക്കുന്ന രീതി", rainFed: "മഴവെള്ളം (10%)", irrigated: "നനയ്ക്കുന്നത് (5%)",
-    livestockTitle: "കന്നുകാലികൾ", sheepGoat: "ആടുകൾ", cattle: "പശുക്കൾ", festGreeting: "ഫിഖ്ഹ് ഹബ്ബിലേക്ക് സ്വാഗതം", festAction: "പ്രവേശിക്കുക",
-    mahjubTitle: "ഹജ്ബ് ചെയ്യപ്പെട്ടവർ (Mahjub)",
-    awlTitle: "ഔൽ മസ്അല (Al-Awl)",
-    awlDesc: "ആകെ ഓഹരികൾ അടിസ്ഥാന സംഖ്യയേക്കാൾ വർദ്ധിച്ചു. അതിനാൽ എല്ലാവർക്കും ആനുപാതികമായ കുറവ് ബാധകമാണ്. ബാധിക്കപ്പെട്ടവർ പർപ്പിൾ നിറത്തിൽ കാണാം.",
-    specialCaseTitle: "പ്രത്യേക മസ്അല (Special Case)",
-    originalAsl: "യഥാർത്ഥ അടിസ്ഥാനം",
-    adjustedAsl: "ക്രമീകരിച്ചത് (ഔൽ)",
-    jabarTitle: "ജബർ മസ്അല (Al-Jabariyyah)",
-    jabarDesc: "ആൺ ബന്ധു പെൺ ബന്ധുവിനെ 'അസ്വബ'യാക്കി (Residue) മാറ്റിയ സാഹചര്യം. ഈ അവകാശികളെ താഴെ മഞ്ഞ നിറത്തിൽ (Amber Glow) ഹൈലൈറ്റ് ചെയ്തിരിക്കുന്നു.",
-    doubleCheckTitle: "അതീവ ശ്രദ്ധിക്കുക!",
-    doubleCheckMsg: "അനന്തരാവകാശ കണക്കുകൾ അതീവ സൂക്ഷ്മതയോടെ കൈകാര്യം ചെയ്യേണ്ടതാണ്. അവകാശികളുടെ എണ്ണവും സ്വത്ത് വിവരങ്ങളും കൃത്യമാണോ എന്ന് പരിശോധിക്കുക. കണക്ക് കാണണോ?",
-    confirmBtn: "അതെ, ഫലം കാണിക്കുക",
-    cancelBtn: "അല്ല, മാറ്റങ്ങൾ വരുത്തണം",
-    detailedSummary: "വിശദമായ വിശകലനം",
-    methodologyDesc: "ഈ കേസിൽ ഉപയോഗിച്ച ഫിഖ്ഹ് നിയമങ്ങളുടെ വിവരണം താഴെ നൽകുന്നു:",
-    jabarTag: "ജബർ മസ്അല",
-    awlTag: "ഔൽ മാറ്റം",
-    blockerTag: "ഹാജിബ് (തടസ്സപ്പെടുത്തിയവർ)",
-    deceasedGender: "മരണപ്പെട്ട വ്യക്തി",
-    male: "പുരുഷൻ",
-    female: "സ്ത്രീ",
-    maxLimit: "പരിധി കഴിഞ്ഞു",
+    title: "ഫിഖ്ഹ് ഹബ്", subtitle: "ഷാഫിഈ കർമ്മശാസ്ത്രം", home: "ഹോം", inheritance: "അനന്തരാവകാശം", zakath: "സകാത്ത്", 
+    back: "പിന്നിലേക്ക്", calculate: "കണക്കാക്കുക", estateValue: "സ്വത്ത് മൂല്യം", runEngine: "കണക്കുകൂട്ടുക", 
+    share: "ഓഹരി", perHead: "ഒരാൾക്ക്", blockedBy: "തടഞ്ഞത്", mahjub: "ഹജ്ബ്", 
+    cashSavings: "പണം & നിക്ഷേപം", goldWeight: "സ്വർണ്ണം (ഗ്രാം)", businessStock: "ബിസിനസ്സ് സ്റ്റോക്ക്",
+    mahjubTitle: "ഹജ്ബ് ചെയ്യപ്പെട്ടവർ (Mahjub)", awlTitle: "ഔൽ മസ്അല (Al-Awl)",
+    awlDesc: "ആകെ ഓഹരികൾ അടിസ്ഥാന സംഖ്യയേക്കാൾ വർദ്ധിച്ചു. എല്ലാവർക്കും ആനുപാതികമായ കുറവ് വരുത്തിയിട്ടുണ്ട് (Purple highlight).",
+    jabarTitle: "ജബർ മസ്അല (Jabar Case)", jabarDesc: "ആൺ ബന്ധു പെൺ ബന്ധുവിനെ 'അസ്വബ'യാക്കി (Residue) മാറ്റിയ സാഹചര്യം. ഇവരെ താഴെ മഞ്ഞ നിറത്തിൽ (Amber) കാണാം.",
+    doubleCheckTitle: "വിവരങ്ങൾ പരിശോധിക്കുക", doubleCheckMsg: "അവകാശികളുടെ എണ്ണവും സ്വത്ത് വിവരങ്ങളും കൃത്യമാണെന്ന് ഉറപ്പുവരുത്തിയ ശേഷം റിപ്പോർട്ട് കാണുക.",
+    confirmBtn: "ഫലം കാണിക്കുക", cancelBtn: "പിന്നിലേക്ക്", deceasedGender: "മരണപ്പെട്ട വ്യക്തി",
+    male: "പുരുഷൻ", female: "സ്ത്രീ", maxLimit: "പരിധി കഴിഞ്ഞു",
+    detailedSummary: "ഫിഖ്ഹ് വിശകലനം (Principles)", methodologyDesc: "ഈ കേസിൽ ഉപയോഗിച്ച പ്രധാന നിയമങ്ങളുടെ വിവരണം താഴെ നൽകുന്നു:",
+    jabarTag: "ജബർ മസ്അല", awlTag: "ഔൽ മാറ്റം", asabahTag: "അസ്വബ", fixedTag: "ഫർള്",
     cats: { 
-      primary: "പ്രധാന അവകാശികൾ",
-      descendants: "സന്താനങ്ങൾ", 
-      ancestors: "മുൻഗാമികൾ",
-      siblings: "സഹോദരങ്ങൾ", 
-      nephews: "സഹോദര പുത്രന്മാർ", 
-      uncles: "പിതൃ സഹോദരന്മാർ",
-      cousins: "പിതൃസഹോദര പുത്രന്മാർ"
+      primary: "പ്രധാന അവകാശികൾ", descendants: "സന്താനങ്ങൾ", ancestors: "മുൻഗാമികൾ", 
+      siblings: "സഹോദരങ്ങൾ", nephews: "സഹോദര പുത്രന്മാർ", uncles: "പിതൃ സഹോദരന്മാർ", cousins: "പിതൃസഹോദര പുത്രന്മാർ" 
     } 
   }
 };
 
 const HEIR_DATA: any = {
-  // Primary
-  husband: { term: "Az-Zawj", en: "Husband", ml: "ഭർത്താവ്", rules: "1/2 or 1/4 (with children)", max: 1 },
-  wife: { term: "Az-Zawjah", en: "Wife", ml: "ഭാര്യ", rules: "1/4 or 1/8 (with children)", max: 4 },
-  father: { term: "Al-Ab", en: "Father", ml: "പിതാവ്", rules: "1/6, Residue, or both", max: 1 },
+  husband: { term: "Az-Zawj", en: "Husband", ml: "ഭർത്താവ്", rules: "1/2 or 1/4", max: 1 },
+  wife: { term: "Az-Zawjah", en: "Wife", ml: "ഭാര്യ", rules: "1/4 or 1/8", max: 4 },
+  father: { term: "Al-Ab", en: "Father", ml: "പിതാവ്", rules: "1/6, Asabah", max: 1 },
   mother: { term: "Al-Umm", en: "Mother", ml: "മാതാവ്", rules: "1/6 or 1/3", max: 1 },
-  // Descendants
-  sons: { term: "Al-Ibn", en: "Son", ml: "മകൻ", rules: "Residue (Asabah bi-Nafsihi)", max: 20 },
-  daughters: { term: "Al-Bint", en: "Daughter", ml: "മകൾ", rules: "1/2, 2/3, or Residue with Son", max: 20 },
-  grandsons: { term: "Ibn al-Ibn", en: "Grandson", ml: "മകന്റെ മകൻ", rules: "Residue, excluded by Son", max: 20 },
-  granddaughters: { term: "Bint al-Ibn", en: "Granddaughter", ml: "മകന്റെ മകൾ", rules: "1/2, 2/3, 1/6, or Residue", max: 20 },
-  greatGrandsons: { term: "Ibn Ibn al-Ibn", en: "Gt-Grandson", ml: "മകന്റെ മകന്റെ മകൻ", rules: "Residue", max: 20 },
-  greatGranddaughters: { term: "Bint Ibn al-Ibn", en: "Gt-Granddaughter", ml: "മകന്റെ മകന്റെ മകൾ", rules: "Complex placement", max: 20 },
-  // Ancestors
-  grandfather: { term: "Al-Jadd", en: "Grandfather", ml: "പിതാമഹൻ", rules: "Excluded by Father", max: 1 },
-  patGrandmother: { term: "Al-Jaddah Ab", en: "Pat. Grandma", ml: "പിതാവിന്റെ മാതാവ്", rules: "Excluded by Father/Mother", max: 1 },
-  matGrandmother: { term: "Al-Jaddah Umm", en: "Mat. Grandma", ml: "മാതാവിന്റെ മാതാവ്", rules: "Excluded by Mother", max: 1 },
-  greatGrandfather: { term: "Al-Jadd al-A'la", en: "Gt-Grandfather", ml: "പിതാവിന്റെ പിതാവ്", rules: "Excluded by closer males", max: 1 },
-  // Siblings
-  fullBrothers: { term: "Al-Akh Shaqiq", en: "Full Brother", ml: "സഹോദരൻ", rules: "Strongest sibling asabah", max: 20 },
-  fullSisters: { term: "Al-Ukht Shaqiqah", en: "Full Sister", ml: "സഹോദരി", rules: "Fixed or Residue", max: 20 },
-  patBrothers: { term: "Al-Akh Ab", en: "Pat. Brother", ml: "പിതൃ സഹോദരൻ", rules: "Excluded by Full Brother", max: 20 },
-  patSisters: { term: "Al-Ukht Ab", en: "Pat. Sister", ml: "പിതൃ സഹോദരി", rules: "Excluded by Full Brother", max: 20 },
-  matBrothers: { term: "Al-Akh Umm", en: "Mat. Brother", ml: "മാതൃ സഹോദരൻ", rules: "1/6 or 1/3 (share equally)", max: 20 },
-  matSisters: { term: "Al-Ukht Umm", en: "Mat. Sister", ml: "മാതൃ സഹോദരി", rules: "1/6 or 1/3 (share equally)", max: 20 },
-  // Nephews
-  fullBroSon: { term: "Ibn al-Shaqiq", en: "Full Nephew", ml: "സഹോദര പുത്രൻ", rules: "Residue", max: 20 },
-  patBroSon: { term: "Ibn al-Akh Ab", en: "Pat. Nephew", ml: "പിതൃ സഹോദര പുത്രൻ", rules: "Residue", max: 20 },
-  fullBroGrs: { term: "Ibn Ibn Shaqiq", en: "Full Nephew Gs", ml: "സഹോദര പൗത്രൻ", rules: "Residue", max: 20 },
-  patBroGrs: { term: "Ibn Ibn Akh Ab", en: "Pat. Nephew Gs", ml: "പിതൃ സഹോദര പൗത്രൻ", rules: "Residue", max: 20 },
-  // Uncles
-  fullPatUncle: { term: "Al-Amm Shaqiq", en: "Full P. Uncle", ml: "പിതൃ സഹോദരൻ (Shaqiq)", rules: "Residue", max: 20 },
-  patUncle: { term: "Al-Amm Li-Ab", en: "Pat. P. Uncle", ml: "പിതൃ സഹോദരൻ (Ab)", rules: "Residue", max: 20 },
-  // Cousins
-  fullPatUncleSon: { term: "Ibn al-Amm Shaqiq", en: "Full Cousin", ml: "പിതൃ സഹോദര പുത്രൻ", rules: "Residue", max: 20 },
-  patUncleSon: { term: "Ibn al-Amm Ab", en: "Pat. Cousin", ml: "പിതൃ സഹോദര പുത്രൻ (Ab)", rules: "Residue", max: 20 },
-  fullPatUncleGrs: { term: "Ibn Ibn Amm", en: "Cousin's Son", ml: "പിതൃ സഹോദര പൗത്രൻ", rules: "Residue", max: 20 }
+  sons: { term: "Al-Ibn", en: "Son", ml: "മകൻ", max: 20 },
+  daughters: { term: "Al-Bint", en: "Daughter", ml: "മകൾ", max: 20 },
+  grandsons: { term: "Ibn al-Ibn", en: "Grandson", ml: "മകന്റെ മകൻ", max: 20 },
+  granddaughters: { term: "Bint al-Ibn", en: "Granddaughter", ml: "മകന്റെ മകൾ", max: 20 },
+  greatGrandsons: { term: "Ibn Ibn al-Ibn", en: "Gt-Grandson", ml: "മകന്റെ മകന്റെ മകൻ", max: 20 },
+  greatGranddaughters: { term: "Bint Ibn al-Ibn", en: "Gt-Granddaughter", ml: "മകന്റെ മകന്റെ മകൾ", max: 20 },
+  grandfather: { term: "Al-Jadd", en: "Grandfather", ml: "പിതാമഹൻ", max: 1 },
+  patGrandmother: { term: "Al-Jaddah Ab", en: "Pat. Grandma", ml: "പിതാവിന്റെ മാതാവ്", max: 1 },
+  matGrandmother: { term: "Al-Jaddah Umm", en: "Mat. Grandma", ml: "മാതാവിന്റെ മാതാവ്", max: 1 },
+  greatGrandfather: { term: "Al-Jadd al-A'la", en: "Gt-Grandfather", ml: "പിതാവിന്റെ പിതാവ്", max: 1 },
+  fullBrothers: { term: "Al-Akh Shaqiq", en: "Full Brother", ml: "സഹോദരൻ", max: 20 },
+  fullSisters: { term: "Al-Ukht Shaqiqah", en: "Full Sister", ml: "സഹോദരി", max: 20 },
+  patBrothers: { term: "Al-Akh Ab", en: "Pat. Brother", ml: "പിതൃ സഹോദരൻ", max: 20 },
+  patSisters: { term: "Al-Ukht Ab", en: "Pat. Sister", ml: "പിതൃ സഹോദരി", max: 20 },
+  matBrothers: { term: "Al-Akh Umm", en: "Mat. Brother", ml: "മാതൃ സഹോദരൻ", max: 20 },
+  matSisters: { term: "Al-Ukht Umm", en: "Mat. Sister", ml: "മാതൃ സഹോദരി", max: 20 },
+  fullBroSon: { term: "Ibn al-Shaqiq", en: "Full Nephew", ml: "സഹോദര പുത്രൻ", max: 20 },
+  patBroSon: { term: "Ibn al-Akh Ab", en: "Pat. Nephew", ml: "പിതൃ സഹോദര പുത്രൻ", max: 20 },
+  fullBroGrs: { term: "Ibn Ibn Shaqiq", en: "Full Nephew Gs", ml: "സഹോദര പൗത്രൻ", max: 20 },
+  patBroGrs: { term: "Ibn Ibn Akh Ab", en: "Pat. Nephew Gs", ml: "പിതൃ സഹോദര പൗത്രൻ", max: 20 },
+  fullPatUncle: { term: "Al-Amm Shaqiq", en: "Full P. Uncle", ml: "പിതൃ സഹോദരൻ (Shaqiq)", max: 20 },
+  patUncle: { term: "Al-Amm Li-Ab", en: "Pat. P. Uncle", ml: "പിതൃ സഹോദരൻ (Ab)", max: 20 },
+  fullPatUncleSon: { term: "Ibn al-Amm Shaqiq", en: "Full Cousin", ml: "പിതൃ സഹോദര പുത്രൻ", max: 20 },
+  patUncleSon: { term: "Ibn al-Amm Ab", en: "Pat. Cousin", ml: "പിതൃ സഹോദര പുത്രൻ (Ab)", max: 20 },
+  fullPatUncleGrs: { term: "Ibn Ibn Amm", en: "Cousin's Son", ml: "പിതൃ സഹോദര പൗത്രൻ", max: 20 }
 };
 
 const HEIR_CATEGORIES = [
@@ -142,393 +98,314 @@ const HEIR_CATEGORIES = [
   { id: 'cousins', heirs: ['fullPatUncleSon', 'patUncleSon', 'fullPatUncleGrs'] }
 ];
 
+// --- ENGINE ---
 const runInheritanceEngine = (inputs: any, estate: number) => {
   const h = (id: string) => inputs[id] || 0;
-  let rawResults: { id: string, num?: number, den?: number, type: 'fixed' | 'asabah' | 'jabar', p?: number, f?: string, note?: string, highlight?: 'amber' | 'purple' | 'indigo' }[] = [];
+  let rawResults: any[] = [];
   let exclusions: any[] = [];
-  let blockers = new Set<string>();
-  let logicML: string[] = [];
-  let logicEN: string[] = [];
+  let methodologyML: string[] = [];
+  let methodologyEN: string[] = [];
   
   const addExcl = (id: string, blocker: string) => { 
     if (h(id) > 0) {
-      exclusions.push({ id, blockedBy: HEIR_DATA[blocker].term });
-      blockers.add(blocker);
-      logicML.push(`${HEIR_DATA[id].ml} ഹജ്ബ് ചെയ്യപ്പെട്ടു (${HEIR_DATA[blocker].ml} ഉള്ളതിനാൽ).`);
-      logicEN.push(`${HEIR_DATA[id].en} is excluded (Mahjub) because of ${HEIR_DATA[blocker].en}.`);
+      exclusions.push({ id, blockedBy: HEIR_DATA[blocker]?.term || blocker });
+      methodologyML.push(`${HEIR_DATA[id].ml} ഹജ്ബ് ചെയ്യപ്പെട്ടു (${HEIR_DATA[blocker].ml} ഉള്ളതിനാൽ).`);
+      methodologyEN.push(`${HEIR_DATA[id].en} is excluded (Mahjub) because of ${HEIR_DATA[blocker].en}.`);
     }
   };
   
-  const hasDesc = (h('sons') > 0 || h('daughters') > 0 || h('grandsons') > 0 || h('granddaughters') > 0 || h('greatGrandsons') > 0 || h('greatGranddaughters') > 0);
-  const hasMaleDesc = (h('sons') > 0 || h('grandsons') > 0 || h('greatGrandsons') > 0);
-  const sibCount = h('fullBrothers') + h('fullSisters') + h('patBrothers') + h('patSisters') + h('matBrothers') + h('matSisters');
+  const hasDesc = (h('sons') + h('daughters') + h('grandsons') + h('granddaughters') + h('greatGrandsons') + h('greatGranddaughters')) > 0;
+  const hasMaleDesc = (h('sons') + h('grandsons') + h('greatGrandsons')) > 0;
+  const sibCount = (h('fullBrothers') + h('fullSisters') + h('patBrothers') + h('patSisters') + h('matBrothers') + h('matSisters'));
 
-  // Blocking logic (Hierarchy of 29)
+  // Blocking logic (Hierarchy)
   if (h('sons') > 0) ['grandsons', 'granddaughters', 'greatGrandsons', 'greatGranddaughters'].forEach(id => addExcl(id, 'sons'));
-  if (h('grandsons') > 0) ['greatGrandsons', 'greatGranddaughters'].forEach(id => addExcl(id, 'grandsons'));
-  
-  if (h('father') > 0) {
-    ['grandfather', 'greatGrandfather', 'patGrandmother', 'fullBrothers', 'fullSisters', 'patBrothers', 'patSisters', 'matBrothers', 'matSisters', 'fullBroSon', 'patBroSon', 'fullBroGrs', 'patBroGrs', 'fullPatUncle', 'patUncle', 'fullPatUncleSon', 'patUncleSon', 'fullPatUncleGrs'].forEach(id => addExcl(id, 'father'));
-  }
+  if (h('father') > 0) ['grandfather', 'greatGrandfather', 'patGrandmother', 'fullBrothers', 'fullSisters', 'patBrothers', 'patSisters', 'matBrothers', 'matSisters', 'fullBroSon', 'patBroSon', 'fullBroGrs', 'patBroGrs', 'fullPatUncle', 'patUncle', 'fullPatUncleSon', 'patUncleSon', 'fullPatUncleGrs'].forEach(id => addExcl(id, 'father'));
   if (h('mother') > 0) ['patGrandmother', 'matGrandmother'].forEach(id => addExcl(id, 'mother'));
   if (hasMaleDesc) ['fullBrothers', 'fullSisters', 'patBrothers', 'patSisters', 'matBrothers', 'matSisters', 'fullBroSon', 'patBroSon', 'fullBroGrs', 'patBroGrs', 'fullPatUncle', 'patUncle', 'fullPatUncleSon', 'patUncleSon', 'fullPatUncleGrs'].forEach(id => addExcl(id, h('sons') > 0 ? 'sons' : 'grandsons'));
-
-  // Sibling blocking
   if (h('fullBrothers') > 0) ['patBrothers', 'patSisters', 'fullBroSon', 'patBroSon', 'fullBroGrs', 'patBroGrs', 'fullPatUncle', 'patUncle', 'fullPatUncleSon', 'patUncleSon', 'fullPatUncleGrs'].forEach(id => addExcl(id, 'fullBrothers'));
-  if (h('patBrothers') > 0) ['fullBroSon', 'patBroSon', 'fullBroGrs', 'patBroGrs', 'fullPatUncle', 'patUncle', 'fullPatUncleSon', 'patUncleSon', 'fullPatUncleGrs'].forEach(id => addExcl(id, 'patBrothers'));
 
   const active = { ...inputs }; exclusions.forEach(e => active[e.id] = 0);
 
-  // Assignment Logic
+  // Assignment logic
   if (active.husband) {
     const d = hasDesc ? 4 : 2;
     rawResults.push({ id: 'husband', num: 1, den: d, type: 'fixed' });
+    methodologyEN.push(`Husband receives 1/${d} ${hasDesc ? 'due to children' : 'as no children exist'}.`);
+    methodologyML.push(`ഭർത്താവിന് 1/${d} ലഭിക്കുന്നു (${hasDesc ? 'സന്താനങ്ങൾ ഉള്ളതിനാൽ' : 'സന്താനങ്ങൾ ഇല്ലാത്തതിനാൽ'}).`);
   } else if (active.wife > 0) {
     const d = hasDesc ? 8 : 4;
     rawResults.push({ id: 'wife', num: 1, den: d, type: 'fixed' });
+    methodologyEN.push(`Wife/Wives receive 1/${d} ${hasDesc ? 'due to children' : 'as no children exist'}.`);
+    methodologyML.push(`ഭാര്യ(മാർ)ക്ക് 1/${d} ലഭിക്കുന്നു (${hasDesc ? 'സന്താനങ്ങൾ ഉള്ളതിനാൽ' : 'സന്താനങ്ങൾ ഇല്ലാത്തതിനാൽ'}).`);
   }
 
   if (active.mother) {
     const d = (hasDesc || sibCount >= 2) ? 6 : 3;
     rawResults.push({ id: 'mother', num: 1, den: d, type: 'fixed' });
+    methodologyEN.push(`Mother receives 1/${d} ${hasDesc || sibCount >= 2 ? 'due to children or multiple siblings' : 'standard share'}.`);
+    methodologyML.push(`മാതാവിന് 1/${d} ലഭിക്കുന്നു (${hasDesc || sibCount >= 2 ? 'സന്താനങ്ങളോ ഒന്നിലധികം സഹോദരങ്ങളോ ഉള്ളതിനാൽ' : 'സാധാരണ ഓഹരി'}).`);
   }
 
   if (active.father && hasMaleDesc) {
     rawResults.push({ id: 'father', num: 1, den: 6, type: 'fixed' });
+    methodologyEN.push(`Father receives 1/6 fixed share due to male descendants.`);
+    methodologyML.push(`ആൺ സന്താനങ്ങൾ ഉള്ളതിനാൽ പിതാവിന് 1/6 നിശ്ചിത ഓഹരി ലഭിക്കുന്നു.`);
   }
 
-  // Daughters and Granddaughters
   if (active.daughters > 0 && active.sons === 0) {
     const n = active.daughters === 1 ? 1 : 2;
     const d = active.daughters === 1 ? 2 : 3;
     rawResults.push({ id: 'daughters', num: n, den: d, type: 'fixed' });
+    methodologyEN.push(`Daughters receive ${n}/${d} fixed share (no sons present).`);
+    methodologyML.push(`ആൺമക്കൾ ഇല്ലാത്തതിനാൽ പെൺമക്കൾക്ക് ${n}/${d} നിശ്ചിത ഓഹരി ലഭിക്കുന്നു.`);
   }
 
-  // Maternal Siblings
-  if ((active.matBrothers + active.matSisters) > 0) {
-    const totalMat = active.matBrothers + active.matSisters;
-    const n = totalMat === 1 ? 1 : 1;
-    const d = totalMat === 1 ? 6 : 3;
-    if (active.matBrothers > 0) rawResults.push({ id: 'matBrothers', num: n, den: d, type: 'fixed' });
-    if (active.matSisters > 0) rawResults.push({ id: 'matSisters', num: n, den: d, type: 'fixed' });
+  // Base Asl Calculation
+  const baseAsl = getLCMOfArray(rawResults.map(r => r.den || 1));
+  let units = 0;
+  rawResults.forEach(r => units += (baseAsl / r.den) * r.num);
+  const isAwl = units > baseAsl;
+  const finalAsl = isAwl ? units : baseAsl;
+
+  if (isAwl) {
+    methodologyEN.push(`Al-Awl (Increase) occurred. Total shares ${units} exceeded original base ${baseAsl}. Proportionally adjusted to ${finalAsl}.`);
+    methodologyML.push(`ഔൽ മസ്അല സംഭവിച്ചു. ആകെ ഓഹരികൾ തികയാത്തതിനാൽ അടിസ്ഥാന സംഖ്യ ${baseAsl}-ൽ നിന്നും ${finalAsl}-ലേക്ക് വർദ്ധിപ്പിച്ചു.`);
   }
 
-  // Common denominator calculation
-  const denominators = rawResults.map(r => r.den || 1);
-  const baseAsl = denominators.length > 0 ? getLCMOfArray(denominators) : 1;
-  let totalFixedUnits = 0;
-  rawResults.forEach(r => totalFixedUnits += (baseAsl / (r.den || 1)) * (r.num || 0));
-  let finalAsl = Math.max(baseAsl, totalFixedUnits);
-  const isAwl = totalFixedUnits > baseAsl;
-
-  rawResults = rawResults.map(r => ({
-    ...r,
-    p: (((baseAsl / (r.den || 1)) * (r.num || 0)) / finalAsl) * 100,
+  let results = rawResults.map(r => ({
+    ...r, ...HEIR_DATA[r.id],
+    p: (((baseAsl / r.den) * r.num) / finalAsl) * 100,
     f: `${r.num}/${r.den}`,
-    highlight: isAwl ? 'purple' : undefined
+    highlight: isAwl ? 'purple' : undefined,
+    tag: 'fixed',
+    amount: estate ? ((((baseAsl / r.den) * r.num) / finalAsl) * estate) : 0
   }));
 
-  // Residue (Asabah)
-  let residueUnits = finalAsl - totalFixedUnits;
+  // Residue logic
+  let residueUnits = finalAsl - units;
   let hasJabar = false;
   if (residueUnits > 0) {
-    const asabahOrder = ['sons', 'grandsons', 'greatGrandsons', 'father', 'grandfather', 'fullBrothers', 'patBrothers', 'fullBroSon', 'patBroSon', 'fullBroGrs', 'patBroGrs', 'fullPatUncle', 'patUncle', 'fullPatUncleSon', 'patUncleSon', 'fullPatUncleGrs'];
-    let topAgnate = asabahOrder.find(id => active[id] > 0);
-    
+    const asabahOrder = ['sons', 'grandsons', 'father', 'grandfather', 'fullBrothers', 'patBrothers', 'fullBroSon', 'patBroSon', 'fullPatUncle', 'patUncle'];
+    const topAgnate = asabahOrder.find(id => active[id] > 0);
     if (topAgnate) {
-      const partners: any = { 'sons':'daughters', 'grandsons':'granddaughters', 'fullBrothers':'fullSisters', 'patBrothers':'patSisters' };
+      const partners: any = { 'sons': 'daughters', 'grandsons': 'granddaughters', 'fullBrothers': 'fullSisters', 'patBrothers': 'patSisters' };
       const pId = partners[topAgnate];
       if (pId && active[pId] > 0) {
         hasJabar = true;
-        const totalAgnateUnits = (active[topAgnate] * 2 + active[pId]);
-        const shareMale = (residueUnits / finalAsl * (2/totalAgnateUnits)) * 100;
-        const shareFemale = (residueUnits / finalAsl * (1/totalAgnateUnits)) * 100;
-        rawResults.push({ id: topAgnate, f: 'Asabah (Jabar)', p: shareMale * active[topAgnate], type: 'jabar', highlight: 'amber' });
-        rawResults.push({ id: pId, f: 'Asabah (Jabar)', p: shareFemale * active[pId], type: 'jabar', highlight: 'amber' });
+        const maleCount = active[topAgnate];
+        const femaleCount = active[pId];
+        const totalU = maleCount * 2 + femaleCount;
+        const resMale = (residueUnits / finalAsl) * (maleCount * 2 / totalU);
+        const resFemale = (residueUnits / finalAsl) * (femaleCount / totalU);
+        results.push({ id: topAgnate, ...HEIR_DATA[topAgnate], f: 'Asabah (2:1)', p: resMale * 100, highlight: 'amber', tag: 'jabar', amount: estate ? (resMale * estate) : 0 });
+        results.push({ id: pId, ...HEIR_DATA[pId], f: 'Asabah (2:1)', p: resFemale * 100, highlight: 'amber', tag: 'jabar', amount: estate ? (resFemale * estate) : 0 });
+        methodologyEN.push(`Jabar Case: ${HEIR_DATA[topAgnate].en} forced ${HEIR_DATA[pId].en} into residue (Asabah) with 2:1 distribution.`);
+        methodologyML.push(`ജബർ മസ്അല: ${HEIR_DATA[topAgnate].ml}, ${HEIR_DATA[pId].ml}-നെ 'അസ്വബ'യാക്കി മാറ്റി (2:1 അനുപാതത്തിൽ വിഹിതം വെക്കുന്നു).`);
       } else {
-        rawResults.push({ id: topAgnate, f: 'Asabah', p: (residueUnits / finalAsl) * 100, type: 'asabah' });
+        results.push({ id: topAgnate, ...HEIR_DATA[topAgnate], f: 'Asabah', p: (residueUnits / finalAsl) * 100, tag: 'asabah', amount: estate ? ((residueUnits / finalAsl) * estate) : 0 });
+        methodologyEN.push(`${HEIR_DATA[topAgnate].en} takes the remaining residue (Asabah).`);
+        methodologyML.push(`${HEIR_DATA[topAgnate].ml} ബാക്കി വരുന്ന മുഴുവൻ സ്വത്തും (അസ്വബ) കൈപ്പറ്റുന്നു.`);
       }
     }
   }
 
-  return { 
-    awl: { occurred: isAwl, originalAsl: baseAsl, newAsl: finalAsl },
-    hasJabar,
-    hasExclusion: blockers.size > 0,
-    logicML,
-    logicEN,
-    winners: rawResults.map(r => ({ ...r, ...HEIR_DATA[r.id], amount: estate ? ((r.p || 0)/100)*estate : 0 })), 
-    losers: exclusions.map(e => ({ ...e, ...HEIR_DATA[e.id] })) 
-  };
+  return { winners: results, losers: exclusions.map(e => ({ ...e, ...HEIR_DATA[e.id] })), awl: isAwl, hasJabar, methodologyML, methodologyEN };
 };
 
 const App = () => {
   const [state, setState] = useState<any>({
-    page: 'splash', lang: 'en', inheritanceInputs: {}, estate: 0, inheritanceResults: null,
-    deceasedGender: 'male',
-    isConfirming: false, detailLang: 'ml',
-    zakahInputs: { cash: 0, gold: 0, silver: 0, business: 0, agriWeight: 0, agriType: 'rainFed', sheepGoat: 0, cattle: 0 },
-    zakahRes: null
+    page: 'splash', lang: 'ml', deceasedGender: 'male', inheritanceInputs: {}, estate: 0, results: null,
+    isConfirming: false, zakahInputs: { cash: 0, gold: 0, business: 0 }
   });
 
   const t = TRANSLATIONS[state.lang];
-  const isAr = state.lang === 'ar';
-  const setPage = (p: string) => setState((s: any) => ({ ...s, page: p, inheritanceResults: null, isConfirming: false }));
-  const setLang = (l: string) => setState((s: any) => ({ ...s, lang: l }));
 
-  const calculateInheritance = () => {
-    setState((s: any) => ({ ...s, inheritanceResults: runInheritanceEngine(s.inheritanceInputs, s.estate), isConfirming: false }));
-  };
-
-  const calculateZakah = () => {
-    const zi = state.zakahInputs;
-    const wealthTotal = zi.cash + (zi.gold * GOLD_PRICE_FIXED) + (zi.silver * SILVER_PRICE_EST) + (zi.business);
-    const nisabReached = wealthTotal >= (NISAB_GOLD * GOLD_PRICE_FIXED);
-    const res = {
-      wealth: { payable: nisabReached ? wealthTotal * 0.025 : 0, reached: nisabReached, total: wealthTotal },
-      agri: { payable: zi.agriWeight >= NISAB_AGRI_KG ? zi.agriWeight * (zi.agriType === 'rainFed' ? 0.1 : 0.05) : 0, weight: zi.agriWeight },
-      livestock: [] as string[]
-    };
-    if (zi.sheepGoat >= 40) res.livestock.push(`${Math.floor(zi.sheepGoat/40)} Sheep/Goat`);
-    setState((s: any) => ({ ...s, zakahRes: res }));
-  };
-
-  const updateHeirCount = (id: string, delta: number) => {
-    const current = state.inheritanceInputs[id] || 0;
+  const updateHeir = (id: string, delta: number) => {
     const max = HEIR_DATA[id]?.max || 20;
-    const nextValue = Math.max(0, Math.min(max, current + delta));
+    const nextValue = Math.max(0, Math.min(max, (state.inheritanceInputs[id] || 0) + delta));
     setState((s: any) => ({ ...s, inheritanceInputs: { ...s.inheritanceInputs, [id]: nextValue } }));
-  };
-
-  const setDeceasedGender = (g: 'male' | 'female') => {
-    // Clear impossible heirs
-    const newInputs = { ...state.inheritanceInputs };
-    if (g === 'male') delete newInputs.husband;
-    else delete newInputs.wife;
-    setState((s: any) => ({ ...s, deceasedGender: g, inheritanceInputs: newInputs }));
   };
 
   if (state.page === 'splash') {
     return (
-      <div className="fixed inset-0 bg-[#020617] flex flex-col items-center justify-center p-6 overflow-hidden">
-        <div className="absolute inset-0 star-field opacity-20"></div>
-        <div className="relative z-10 text-center space-y-16 animate-fade-in">
-          <div className="space-y-4">
-            <h2 className="text-amber-400 text-sm font-black uppercase tracking-[0.5em]">Bismillah</h2>
-            <h1 className="text-5xl md:text-8xl font-black text-white tracking-tighter uppercase leading-none">{t.festGreeting}</h1>
-            <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">{t.subtitle}</p>
-          </div>
-          <div className="flex bg-slate-900/40 p-1.5 rounded-2xl border border-white/10 inline-flex">
-            {['en','ml'].map(l => (
-              <button key={l} onClick={() => setLang(l)} className={`px-6 py-3 rounded-xl text-[10px] font-black uppercase transition-all ${state.lang === l ? 'bg-amber-600 text-white' : 'text-slate-500 hover:text-slate-300'}`}>{l}</button>
-            ))}
-          </div>
-          <button onClick={() => setPage('home')} className="group px-12 py-6 bg-transparent rounded-full font-black uppercase tracking-[0.4em] text-white border border-amber-400 hover:shadow-[0_0_50px_rgba(251,191,36,0.3)] transition-all">
-            {t.festAction}
-          </button>
+      <div className="fixed inset-0 bg-[#020617] flex flex-col items-center justify-center p-6 text-center animate-fade-in overflow-hidden">
+        <div className="star-field opacity-20 absolute inset-0"></div>
+        <Scale size={80} className="text-blue-500 mb-8 animate-bounce" />
+        <h1 className="text-6xl font-black text-white tracking-tighter uppercase mb-4">{t.title}</h1>
+        <p className="text-blue-400 font-bold uppercase tracking-[0.4em] text-xs">{t.subtitle}</p>
+        <div className="flex bg-slate-900/60 p-1.5 rounded-2xl border border-white/10 my-10 relative z-10">
+          {['en', 'ml'].map(l => (
+            <button key={l} onClick={() => setState((s: any) => ({ ...s, lang: l }))} className={`px-8 py-3 rounded-xl text-[10px] font-black uppercase transition-all ${state.lang === l ? 'bg-blue-600 text-white shadow-xl scale-105' : 'text-slate-500 hover:text-slate-300'}`}>{l}</button>
+          ))}
         </div>
+        <button onClick={() => setState((s: any) => ({ ...s, page: 'home' }))} className="relative z-10 px-16 py-6 bg-transparent border-2 border-blue-600 rounded-full font-black text-white uppercase tracking-[0.3em] shadow-[0_0_50px_rgba(37,99,235,0.2)] hover:bg-blue-600 transition-all active:scale-95 group">
+          <span className="flex items-center gap-3">പ്രവേശിക്കുക <ChevronRight className="group-hover:translate-x-2 transition-transform"/></span>
+        </button>
       </div>
     );
   }
 
   return (
-    <div className={`min-h-screen flex flex-col ${isAr ? 'arabic text-right' : ''}`}>
-      <header className="bg-slate-900/60 backdrop-blur-xl border-b border-white/10 p-4 lg:p-6 sticky top-0 z-50 flex justify-between items-center">
-        <div onClick={() => setPage('home')} className="flex items-center gap-4 cursor-pointer group">
+    <div className="min-h-screen bg-[#020617] text-slate-100 flex flex-col font-sans overflow-x-hidden">
+      <header className="p-5 border-b border-white/10 bg-slate-950/50 backdrop-blur-md sticky top-0 z-50 flex justify-between items-center">
+        <div onClick={() => setState((s: any) => ({ ...s, page: 'home', results: null }))} className="flex items-center gap-3 cursor-pointer group">
           <Scale className="text-blue-400 group-hover:rotate-12 transition-transform" />
           <h1 className="font-black text-xl lg:text-2xl tracking-tighter uppercase">{t.title}</h1>
         </div>
-        <div className="flex bg-slate-950 p-1 rounded-xl border border-white/5">
-          {['en','ml'].map(l => (
-            <button key={l} onClick={() => setLang(l)} className={`px-4 py-1.5 rounded-lg text-[9px] font-black uppercase ${state.lang === l ? 'bg-blue-600 text-white' : 'text-slate-500'}`}>{l}</button>
+        <div className="flex bg-slate-900 p-1 rounded-xl border border-white/5">
+          {['en', 'ml'].map(l => (
+            <button key={l} onClick={() => setState((s: any) => ({ ...s, lang: l }))} className={`px-4 py-1.5 rounded-lg text-[9px] font-black uppercase ${state.lang === l ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500'}`}>{l}</button>
           ))}
         </div>
       </header>
 
-      <main className="flex-grow w-full max-w-7xl mx-auto p-4 lg:p-8">
+      <main className="max-w-6xl mx-auto w-full p-4 lg:p-10 flex-grow">
         {state.page === 'home' && (
-          <div className="space-y-12 animate-fade-in py-10">
-            <div className="text-center">
-              <div className="inline-block p-10 bg-blue-600/10 rounded-[3.5rem] mb-8 border border-blue-400/20 shadow-2xl"><Scale size={60} className="text-blue-400" /></div>
-              <h1 className="text-5xl lg:text-7xl font-black tracking-tighter uppercase">{t.title}</h1>
-              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-blue-400 mt-4">{t.subtitle}</p>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-              <button onClick={() => setPage('inheritance')} className="p-10 lg:p-16 glass-card rounded-[2.5rem] hover:border-blue-400 transition-all text-left group">
-                <Calculator size={32} className="mb-6 text-blue-400 group-hover:scale-110 transition-transform" />
-                <h3 className="text-2xl lg:text-3xl font-black uppercase">{t.inheritance}</h3>
-                <p className="text-[9px] text-slate-500 font-bold uppercase mt-2">29 Heirs Support Engine</p>
-              </button>
-              <button onClick={() => setPage('zakath')} className="p-10 lg:p-16 glass-card rounded-[2.5rem] hover:border-emerald-400 transition-all text-left group">
-                <Wallet size={32} className="mb-6 text-emerald-400 group-hover:scale-110 transition-transform" />
-                <h3 className="text-2xl lg:text-3xl font-black uppercase">{t.zakath}</h3>
-                <p className="text-[9px] text-slate-500 font-bold uppercase mt-2">Nisab Tracking System</p>
-              </button>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
+            <button onClick={() => setState((s: any) => ({ ...s, page: 'inheritance' }))} className="p-12 lg:p-16 bg-slate-900/40 border border-white/10 rounded-[3.5rem] text-left hover:border-blue-500/50 hover:bg-slate-900/60 transition-all group relative overflow-hidden">
+              <Calculator size={48} className="mb-6 text-blue-400 group-hover:scale-110 transition-transform" />
+              <h2 className="text-4xl font-black uppercase tracking-tight">{t.inheritance}</h2>
+              <p className="text-[11px] text-slate-500 font-bold uppercase mt-2 tracking-widest">Shafi'i 29-Heir Calculation</p>
+              <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-blue-500/5 rounded-full blur-3xl"></div>
+            </button>
+            <button onClick={() => setState((s: any) => ({ ...s, page: 'zakath' }))} className="p-12 lg:p-16 bg-slate-900/40 border border-white/10 rounded-[3.5rem] text-left hover:border-emerald-500/50 hover:bg-slate-900/60 transition-all group relative overflow-hidden">
+              <Wallet size={48} className="mb-6 text-emerald-400 group-hover:scale-110 transition-transform" />
+              <h2 className="text-4xl font-black uppercase tracking-tight">{t.zakath}</h2>
+              <p className="text-[11px] text-slate-500 font-bold uppercase mt-2 tracking-widest">Nisab Threshold Checker</p>
+              <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-emerald-500/5 rounded-full blur-3xl"></div>
+            </button>
           </div>
         )}
 
         {state.page === 'inheritance' && (
           <div className="space-y-10 animate-fade-in">
             <div className="flex items-center gap-4">
-              <button onClick={() => setPage('home')} className="p-3 bg-slate-900 border border-white/10 rounded-xl"><ArrowLeft size={18}/></button>
+              <button onClick={() => setState((s: any) => ({ ...s, page: 'home' }))} className="p-3 bg-slate-900 border border-white/10 rounded-2xl hover:bg-slate-800 transition-colors"><ArrowLeft size={20}/></button>
               <h2 className="text-3xl font-black uppercase tracking-tighter">{t.inheritance}</h2>
             </div>
-            
+
             {state.isConfirming && (
-              <div className="fixed inset-0 z-[100] bg-slate-950/90 backdrop-blur-sm flex items-center justify-center p-6">
-                <div className="max-w-md w-full glass-card p-10 rounded-[2.5rem] border-rose-500/30 space-y-8 animate-in zoom-in duration-300">
-                   <div className="flex flex-col items-center text-center space-y-4">
-                      <div className="p-5 bg-rose-500/10 rounded-full border border-rose-500/20 text-rose-500">
-                        <AlertTriangle size={40} />
-                      </div>
-                      <h3 className="text-2xl font-black uppercase tracking-tight text-rose-400">{t.doubleCheckTitle}</h3>
-                      <p className="text-slate-400 font-medium text-xs leading-relaxed">{t.doubleCheckMsg}</p>
-                   </div>
-                   <div className="flex flex-col gap-3">
-                     <button onClick={calculateInheritance} className="w-full bg-blue-600 py-5 rounded-xl font-black uppercase tracking-widest flex items-center justify-center gap-3">
-                       <CheckCircle2 size={20} /> {t.confirmBtn}
-                     </button>
-                     <button onClick={() => setState((s: any) => ({ ...s, isConfirming: false }))} className="w-full bg-slate-900 py-5 rounded-xl font-black uppercase tracking-widest text-slate-500 text-xs border border-white/5">
-                       {t.cancelBtn}
-                     </button>
+              <div className="fixed inset-0 z-[100] bg-slate-950/95 backdrop-blur-sm flex items-center justify-center p-6 text-center">
+                <div className="max-w-md w-full bg-slate-900 p-12 rounded-[3.5rem] border border-white/10 space-y-8 shadow-2xl animate-in zoom-in duration-300">
+                   <AlertTriangle size={64} className="text-blue-500 mx-auto animate-pulse" />
+                   <h3 className="text-2xl font-black uppercase tracking-tight">{t.doubleCheckTitle}</h3>
+                   <p className="text-slate-400 text-sm leading-relaxed">{t.doubleCheckMsg}</p>
+                   <div className="flex flex-col gap-4">
+                     <button onClick={() => setState((s: any) => ({ ...s, results: runInheritanceEngine(state.inheritanceInputs, state.estate), isConfirming: false }))} className="w-full bg-blue-600 py-6 rounded-2xl font-black uppercase text-lg hover:bg-blue-500 shadow-xl transition-all">{t.confirmBtn}</button>
+                     <button onClick={() => setState((s: any) => ({ ...s, isConfirming: false }))} className="w-full bg-slate-950 py-5 rounded-2xl font-black uppercase text-xs text-slate-500 border border-white/5">{t.cancelBtn}</button>
                    </div>
                 </div>
               </div>
             )}
 
-            {!state.inheritanceResults ? (
-              <div className="glass-card rounded-[2.5rem] p-8 lg:p-12 space-y-12 shadow-2xl">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-end">
+            {!state.results ? (
+              <div className="bg-slate-900/40 p-10 lg:p-14 rounded-[4rem] border border-white/5 space-y-16 shadow-2xl">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                   <div className="space-y-4">
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block text-center md:text-left">{t.estateValue}</label>
-                    <input type="number" onChange={e => setState((s: any) => ({ ...s, estate: Number(e.target.value) }))} className="w-full p-6 bg-slate-950 border border-white/10 rounded-[1.5rem] text-4xl font-black text-center text-white outline-none focus:ring-2 focus:ring-blue-500/20" placeholder="0.00" />
+                    <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest block text-center md:text-left">{t.estateValue}</label>
+                    <input type="number" onChange={e => setState((s: any) => ({ ...s, estate: Number(e.target.value) }))} className="w-full p-8 bg-slate-950 border border-white/10 rounded-[2.5rem] text-4xl font-black text-center text-white outline-none focus:ring-4 focus:ring-blue-500/20 transition-all placeholder-slate-900" placeholder="0.00" />
                   </div>
                   <div className="space-y-4">
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block text-center md:text-left">{t.deceasedGender}</label>
-                    <div className="flex bg-slate-950 p-2 rounded-[1.5rem] border border-white/10 gap-2">
-                      <button onClick={() => setDeceasedGender('male')} className={`flex-1 py-4 rounded-xl font-black uppercase text-xs flex items-center justify-center gap-2 transition-all ${state.deceasedGender === 'male' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-400'}`}>
-                        <User size={16} /> {t.male}
-                      </button>
-                      <button onClick={() => setDeceasedGender('female')} className={`flex-1 py-4 rounded-xl font-black uppercase text-xs flex items-center justify-center gap-2 transition-all ${state.deceasedGender === 'female' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-400'}`}>
-                        <User size={16} /> {t.female}
-                      </button>
+                    <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest block text-center md:text-left">{t.deceasedGender}</label>
+                    <div className="flex bg-slate-950 p-2.5 rounded-[2.5rem] border border-white/10 gap-3">
+                      {['male', 'female'].map(g => (
+                        <button key={g} onClick={() => setState((s: any) => ({ ...s, deceasedGender: g }))} className={`flex-1 py-5 rounded-2xl font-black uppercase text-xs flex items-center justify-center gap-3 transition-all ${state.deceasedGender === g ? 'bg-blue-600 text-white shadow-xl scale-105' : 'text-slate-600 hover:text-slate-400'}`}>
+                          <User size={18} /> {t[g]}
+                        </button>
+                      ))}
                     </div>
                   </div>
                 </div>
 
-                <div className="space-y-10">
+                <div className="space-y-14">
                   {HEIR_CATEGORIES.map(cat => (
-                    <div key={cat.id} className="space-y-4">
-                      <div className="flex items-center gap-3 px-2">
-                        <ChevronRight size={14} className="text-blue-400" />
-                        <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-300">{t.cats[cat.id]}</h3>
+                    <div key={cat.id} className="space-y-6">
+                      <div className="flex items-center gap-3 px-2 border-l-4 border-blue-500">
+                        <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-blue-400 ml-3">{t.cats[cat.id]}</h3>
                       </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        {cat.heirs
-                          .filter(id => (state.deceasedGender === 'male' && id !== 'husband') || (state.deceasedGender === 'female' && id !== 'wife') || (id !== 'husband' && id !== 'wife'))
-                          .map(id => {
-                            const val = state.inheritanceInputs[id] || 0;
-                            const max = HEIR_DATA[id]?.max || 20;
-                            const isMax = val >= max;
-                            const isPrimary = cat.id === 'primary';
-                            
-                            return (
-                              <div key={id} className={`p-5 rounded-[1.5rem] border flex flex-col gap-3 transition-all ${isPrimary ? 'bg-blue-900/10 border-blue-500/20 shadow-blue-500/5' : 'bg-slate-950/50 border-white/5'} hover:border-blue-500/40`}>
-                                <div className="flex justify-between items-start">
-                                  <div className="flex flex-col">
-                                    <span className="text-[10px] font-black uppercase text-white leading-tight">{(HEIR_DATA as any)[id][state.lang]}</span>
-                                    {max < 20 && <span className="text-[7px] font-bold text-slate-500 uppercase mt-1">Max {max}</span>}
-                                  </div>
-                                  <Info size={10} className="text-slate-700" title={HEIR_DATA[id].rules} />
-                                </div>
-                                <div className="flex justify-between items-center">
-                                  <button onClick={() => updateHeirCount(id, -1)} className="p-2 bg-slate-900 rounded-lg border border-white/5 text-slate-500 hover:text-white transition-colors"><Minus size={14}/></button>
-                                  <div className="flex flex-col items-center">
-                                    <span className={`font-black text-xl ${isMax && max < 20 ? 'text-blue-400' : 'text-white'}`}>{val}</span>
-                                  </div>
-                                  <button onClick={() => updateHeirCount(id, 1)} disabled={isMax} className={`p-2 bg-slate-900 rounded-lg border border-white/5 transition-colors ${isMax ? 'opacity-20 cursor-not-allowed' : 'text-slate-500 hover:text-white'}`}><Plus size={14}/></button>
-                                </div>
-                                {isMax && max < 20 && <div className="text-center text-[7px] font-black uppercase text-blue-500 tracking-widest">{t.maxLimit}</div>}
-                              </div>
-                            );
-                        })}
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+                        {cat.heirs.filter(id => (id === 'husband' ? state.deceasedGender === 'female' : id === 'wife' ? state.deceasedGender === 'male' : true)).map(id => (
+                          <div key={id} className="p-6 bg-slate-950/50 rounded-[2.5rem] border border-white/5 flex flex-col gap-6 hover:border-blue-500/40 transition-all shadow-lg group">
+                            <span className="text-[10px] font-black uppercase text-slate-500 group-hover:text-slate-300 transition-colors leading-tight">{(HEIR_DATA as any)[id][state.lang]}</span>
+                            <div className="flex justify-between items-center">
+                              <button onClick={() => updateHeir(id, -1)} className="p-3 bg-slate-900 rounded-xl hover:bg-slate-800"><Minus size={16}/></button>
+                              <span className="font-black text-3xl tracking-tighter text-white">{state.inheritanceInputs[id] || 0}</span>
+                              <button onClick={() => updateHeir(id, 1)} className="p-3 bg-slate-900 rounded-xl hover:bg-slate-800"><Plus size={16}/></button>
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     </div>
                   ))}
                 </div>
-                
-                <button onClick={() => setState((s: any) => ({ ...s, isConfirming: true }))} className="w-full bg-blue-600 py-8 rounded-[1.5rem] font-black uppercase tracking-widest text-xl shadow-2xl hover:bg-blue-500 transition-all active:scale-[0.98]">{t.runEngine}</button>
+                <button onClick={() => setState((s: any) => ({ ...s, isConfirming: true }))} className="w-full bg-blue-600 py-10 rounded-[3rem] font-black uppercase tracking-[0.3em] text-2xl shadow-2xl hover:bg-blue-500 active:scale-95 transition-all">{t.runEngine}</button>
               </div>
             ) : (
-              <div className="space-y-10 pb-20">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-2xl font-black uppercase tracking-tighter flex items-center gap-3 text-blue-400">
-                    <UserCheck /> {t.faraid} Results
-                  </h3>
-                  <button onClick={() => setState((s: any) => ({ ...s, inheritanceResults: null }))} className="flex items-center gap-2 text-[9px] font-black uppercase text-slate-500 hover:text-white transition-colors">
-                    <RefreshCcw size={12} /> Recalculate
-                  </button>
+              <div className="space-y-12 pb-24 animate-in slide-in-from-bottom-10 duration-500">
+                <div className="flex justify-between items-center border-b border-white/5 pb-8">
+                  <h3 className="text-3xl font-black uppercase tracking-tighter text-blue-400 flex items-center gap-4"><UserCheck size={32}/> {t.inheritance} Results</h3>
+                  <button onClick={() => setState((s: any) => ({ ...s, results: null }))} className="text-[10px] font-black uppercase text-slate-500 hover:text-white transition-colors bg-slate-900 px-6 py-3 rounded-2xl border border-white/10 shadow-lg flex items-center gap-2"><RefreshCcw size={16}/> {t.back}</button>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {state.inheritanceResults.awl.occurred && (
-                    <div className="p-6 bg-purple-500/10 border border-purple-500/30 rounded-[1.5rem] flex items-start gap-4 animate-fade-in relative overflow-hidden">
-                      <Layers className="text-purple-400 shrink-0" size={24} />
-                      <div className="space-y-1">
-                        <h4 className="text-sm font-black uppercase tracking-tight text-purple-400">{t.awlTitle}</h4>
-                        <p className="text-[10px] text-slate-400 leading-relaxed">{t.awlDesc}</p>
+                {/* SPECIAL CASE ALERTS */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {state.results.awl && (
+                    <div className="p-10 bg-purple-500/10 border-2 border-purple-500/30 rounded-[3rem] flex items-start gap-6 shadow-[0_0_50px_rgba(168,85,247,0.15)] relative overflow-hidden group">
+                      <div className="absolute -right-5 -bottom-5 opacity-10 group-hover:scale-110 transition-transform"><Layers size={100} /></div>
+                      <div className="p-4 bg-purple-500/20 rounded-2xl border border-purple-500/40"><Layers className="text-purple-400" size={32} /></div>
+                      <div>
+                        <h4 className="text-xl font-black uppercase tracking-tight text-purple-400 mb-2">{t.awlTitle}</h4>
+                        <p className="text-sm text-slate-300 leading-relaxed font-medium">{t.awlDesc}</p>
                       </div>
                     </div>
                   )}
-                  {state.inheritanceResults.hasJabar && (
-                    <div className="p-6 bg-amber-500/10 border border-amber-500/30 rounded-[1.5rem] flex items-start gap-4 animate-fade-in relative overflow-hidden">
-                      <Zap className="text-amber-500 shrink-0" size={24} />
-                      <div className="space-y-1">
-                        <h4 className="text-sm font-black uppercase tracking-tight text-amber-500">{t.jabarTitle}</h4>
-                        <p className="text-[10px] text-slate-400 leading-relaxed">{t.jabarDesc}</p>
+                  {state.results.hasJabar && (
+                    <div className="p-10 bg-amber-500/10 border-2 border-amber-500/30 rounded-[3rem] flex items-start gap-6 shadow-[0_0_50px_rgba(245,158,11,0.15)] relative overflow-hidden group">
+                      <div className="absolute -right-5 -bottom-5 opacity-10 group-hover:scale-110 transition-transform"><Zap size={100} /></div>
+                      <div className="p-4 bg-amber-500/20 rounded-2xl border border-amber-500/40"><Zap className="text-amber-500" size={32} /></div>
+                      <div>
+                        <h4 className="text-xl font-black uppercase tracking-tight text-amber-500 mb-2">{t.jabarTitle}</h4>
+                        <p className="text-sm text-slate-300 leading-relaxed font-medium">{t.jabarDesc}</p>
                       </div>
                     </div>
                   )}
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 animate-fade-in">
-                  {state.inheritanceResults.winners.map((r: any) => {
-                    const hType = r.highlight;
-                    const borderClass = hType === 'amber' ? 'border-amber-400 bg-amber-400/5' : 
-                                      hType === 'purple' ? 'border-purple-500 bg-purple-500/5' : 
-                                      'border-blue-400/20 hover:border-blue-400/40';
-                    const tagLabel = hType === 'amber' ? t.jabarTag : hType === 'purple' ? t.awlTag : null;
-                    const tagColor = hType === 'amber' ? 'bg-amber-400' : hType === 'purple' ? 'bg-purple-500' : '';
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {state.results.winners.map((r: any) => {
                     const count = state.inheritanceInputs[r.id] || 1;
+                    const isAmber = r.highlight === 'amber';
+                    const isPurple = r.highlight === 'purple';
+                    const borderColor = isAmber ? 'border-amber-400 shadow-[0_0_40px_rgba(251,191,36,0.1)]' : isPurple ? 'border-purple-500 shadow-[0_0_40px_rgba(168,85,247,0.1)]' : 'border-white/5';
+                    const tagLabel = isAmber ? t.jabarTag : isPurple ? t.awlTag : (r.tag === 'asabah' ? t.asabahTag : t.fixedTag);
+                    const tagColor = isAmber ? 'bg-amber-400' : isPurple ? 'bg-purple-500' : (r.tag === 'asabah' ? 'bg-blue-600' : 'bg-slate-800');
 
                     return (
-                      <div key={r.id} className={`p-6 glass-card rounded-[1.5rem] flex flex-col transition-all relative overflow-hidden border-2 ${borderClass}`}>
-                        {tagLabel && (
-                          <div className={`absolute top-0 right-0 px-2 py-1 ${tagColor} text-slate-900 font-black text-[7px] uppercase tracking-widest rounded-bl-xl z-20`}>
-                            {tagLabel}
-                          </div>
-                        )}
-                        <div className="flex justify-between mb-4">
-                          <div className="flex flex-col">
-                            <span className={`font-black text-lg tracking-tighter ${hType === 'amber' ? 'text-amber-400' : hType === 'purple' ? 'text-purple-300' : 'text-white'}`}>{r[state.lang]}</span>
-                            <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">({r.term})</span>
+                      <div key={r.id} className={`p-10 bg-slate-900/40 rounded-[3rem] border-2 transition-all relative overflow-hidden group hover:scale-[1.02] duration-300 ${borderColor}`}>
+                        <div className={`absolute top-0 right-0 px-5 py-2 ${tagColor} text-slate-900 font-black text-[9px] uppercase tracking-widest rounded-bl-[1.5rem] z-20 shadow-lg`}>
+                          {tagLabel}
+                        </div>
+                        <div className="flex justify-between items-start mb-10">
+                          <div>
+                            <h4 className={`text-2xl font-black tracking-tighter ${isAmber ? 'text-amber-400' : isPurple ? 'text-purple-300' : 'text-white'}`}>{r[state.lang]}</h4>
+                            <p className="text-[11px] text-slate-500 font-bold uppercase tracking-widest mt-1">({r.term})</p>
                           </div>
                           <div className="text-right">
-                            <span className={`text-2xl font-black ${hType === 'amber' ? 'text-amber-400' : hType === 'purple' ? 'text-purple-400' : 'text-blue-400'}`}>{r.f || 'Asabah'}</span>
-                            <div className="text-[9px] text-slate-500 font-bold uppercase">{(r.p || 0).toFixed(2)}%</div>
+                            <span className={`text-4xl font-black ${isAmber ? 'text-amber-400' : isPurple ? 'text-purple-400' : 'text-blue-500'}`}>{r.f || 'Asabah'}</span>
+                            <p className="text-[11px] font-bold text-slate-500 uppercase tracking-[0.2em] mt-2">{(r.p || 0).toFixed(1)}%</p>
                           </div>
                         </div>
                         {state.estate > 0 && (
-                          <div className="mt-auto pt-4 border-t border-white/5 flex flex-col gap-2">
+                          <div className="pt-8 border-t border-white/5 space-y-5">
                             <div className="flex justify-between items-baseline">
-                              <span className="text-[8px] font-black text-slate-500 uppercase">{t.share}:</span>
-                              <span className={`text-xl font-black ${hType === 'amber' ? 'text-amber-400' : hType === 'purple' ? 'text-purple-200' : 'text-white'}`}>₹{r.amount.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                              <span className="text-[11px] font-black text-slate-600 uppercase tracking-[0.3em]">{t.share}:</span>
+                              <span className="text-3xl font-black text-white">₹{r.amount.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                             </div>
                             {count > 1 && (
-                              <div className="flex justify-between items-center px-3 py-1.5 bg-white/5 rounded-lg border border-white/5">
-                                <span className="text-[7px] font-black text-slate-500 uppercase">{t.perHead} ({count}):</span>
-                                <span className="text-[10px] font-black text-blue-400">₹{(r.amount / count).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                              <div className="bg-white/5 p-4 rounded-2xl flex justify-between items-center border border-white/5 shadow-inner">
+                                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{t.perHead} ({count}):</span>
+                                <span className="text-base font-black text-blue-400">₹{(r.amount / count).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                               </div>
                             )}
                           </div>
@@ -538,18 +415,43 @@ const App = () => {
                   })}
                 </div>
 
-                {state.inheritanceResults.losers.length > 0 && (
-                  <div className="space-y-6 pt-10 border-t border-white/10">
-                    <h3 className="text-xl font-black uppercase tracking-tighter flex items-center gap-3 text-slate-500"><UserX className="text-rose-500" /> {t.mahjubTitle}</h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                      {state.inheritanceResults.losers.map((r: any) => (
-                        <div key={r.id} className="p-5 glass-card border-rose-500/10 rounded-[1.5rem] flex flex-col mahjub-card">
-                          <span className="font-black text-base text-slate-300 tracking-tighter">{r[state.lang]}</span>
-                          <div className="mt-auto pt-3 border-t border-white/5 font-black text-[8px] text-rose-400 uppercase tracking-widest">{t.blockedBy}: {r.blockedBy}</div>
+                {/* METHODOLOGY SECTION (PRINCIPLES / TEACHERS) */}
+                <div className="bg-slate-900/60 p-12 lg:p-16 rounded-[4rem] border border-white/10 space-y-10 shadow-2xl relative overflow-hidden">
+                  <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none"><BookOpen size={180}/></div>
+                  <div className="flex items-center gap-4 text-blue-400 border-b border-white/10 pb-8">
+                    <div className="p-3 bg-blue-500/10 rounded-2xl border border-blue-500/20"><FileText size={32}/></div>
+                    <h3 className="text-3xl font-black uppercase tracking-tight">{t.detailedSummary}</h3>
+                  </div>
+                  <p className="text-slate-400 text-sm italic font-medium">{t.methodologyDesc}</p>
+                  <ul className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {(state.lang === 'ml' ? state.results.methodologyML : state.results.methodologyEN).map((step: string, idx: number) => (
+                      <li key={idx} className="flex gap-6 items-start bg-slate-950/40 p-6 rounded-3xl border border-white/5 hover:border-blue-500/30 transition-all group">
+                        <div className="w-10 h-10 rounded-full bg-blue-600/10 border border-blue-400/20 flex items-center justify-center shrink-0 font-black text-blue-400 text-sm shadow-xl group-hover:scale-110 transition-transform">{idx + 1}</div>
+                        <p className="text-slate-200 text-sm leading-relaxed font-semibold">{step}</p>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* EXCLUDED RELATIVES */}
+                {state.results.losers.length > 0 && (
+                   <div className="space-y-8 pt-12 border-t border-white/10">
+                    <h3 className="text-2xl font-black uppercase text-slate-500 flex items-center gap-4"><UserX className="text-rose-500" size={32}/> {t.mahjubTitle}</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                      {state.results.losers.map((r: any) => (
+                        <div key={r.id} className="p-8 bg-slate-900/20 border-2 border-white/5 border-dashed rounded-[3rem] opacity-60 flex flex-col justify-between h-44 hover:opacity-100 transition-all hover:bg-rose-500/5 group">
+                          <div>
+                            <span className="font-black text-xl text-slate-300 tracking-tight group-hover:text-white transition-colors">{r[state.lang]}</span>
+                            <p className="text-[10px] text-slate-600 font-bold uppercase mt-1 tracking-widest">{r.term}</p>
+                          </div>
+                          <div className="mt-4 py-2 px-4 bg-rose-500/10 rounded-xl border border-rose-500/20 flex items-center gap-2">
+                             <UserX size={14} className="text-rose-400" />
+                             <span className="text-[9px] font-black text-rose-500 uppercase tracking-widest">{t.blockedBy}: {r.blockedBy}</span>
+                          </div>
                         </div>
                       ))}
                     </div>
-                  </div>
+                   </div>
                 )}
               </div>
             )}
@@ -557,42 +459,30 @@ const App = () => {
         )}
 
         {state.page === 'zakath' && (
-          <div className="space-y-12 animate-fade-in">
+          <div className="space-y-12 animate-fade-in max-w-2xl mx-auto py-10">
              <div className="flex items-center gap-4">
-              <button onClick={() => setPage('home')} className="p-3 bg-slate-900 border border-white/10 rounded-xl"><ArrowLeft size={18}/></button>
+              <button onClick={() => setState((s: any) => ({ ...s, page: 'home' }))} className="p-3 bg-slate-900 border border-white/10 rounded-2xl hover:bg-slate-800 transition-colors"><ArrowLeft size={24}/></button>
               <h2 className="text-3xl font-black uppercase tracking-tighter">{t.zakath}</h2>
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <div className="glass-card p-10 rounded-[2.5rem] space-y-10 shadow-2xl">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                   <div className="space-y-2">
-                      <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest">{t.cashSavings}</label>
-                      <input type="number" onChange={e => setState((s: any) => ({ ...s, zakahInputs: { ...s.zakahInputs, cash: Number(e.target.value) } }))} className="w-full p-4 bg-slate-950 rounded-xl border border-white/5 text-white font-black outline-none focus:ring-2 focus:ring-blue-500/20" />
-                   </div>
-                   <div className="space-y-2">
-                      <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest">{t.goldWeight}</label>
-                      <input type="number" onChange={e => setState((s: any) => ({ ...s, zakahInputs: { ...s.zakahInputs, gold: Number(e.target.value) } }))} className="w-full p-4 bg-slate-950 rounded-xl border border-white/5 text-white font-black outline-none focus:ring-2 focus:ring-blue-500/20" />
-                   </div>
-                   <div className="space-y-2">
-                      <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest">{t.businessStock}</label>
-                      <input type="number" onChange={e => setState((s: any) => ({ ...s, zakahInputs: { ...s.zakahInputs, business: Number(e.target.value) } }))} className="w-full p-4 bg-slate-950 rounded-xl border border-white/5 text-white font-black outline-none focus:ring-2 focus:ring-blue-500/20" />
-                   </div>
-                   <div className="space-y-2">
-                      <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest">{t.silverWeight}</label>
-                      <input type="number" onChange={e => setState((s: any) => ({ ...s, zakahInputs: { ...s.zakahInputs, silver: Number(e.target.value) } }))} className="w-full p-4 bg-slate-950 rounded-xl border border-white/5 text-white font-black outline-none focus:ring-2 focus:ring-blue-500/20" />
-                   </div>
-                </div>
-                <button onClick={calculateZakah} className="w-full bg-blue-600 py-6 rounded-xl font-black uppercase text-lg shadow-2xl hover:bg-blue-500 transition-all active:scale-[0.98]">{t.calculate}</button>
-              </div>
-              {state.zakahRes && (
-                <div className="p-10 glass-card rounded-[2.5rem] bg-emerald-600/5 border-emerald-400/20 shadow-2xl flex flex-col justify-center text-center animate-in zoom-in">
-                   <span className="text-xs font-black text-emerald-400 uppercase tracking-[0.3em] block mb-4">Payable Zakah</span>
-                   <h3 className="text-5xl lg:text-7xl font-black text-white tracking-tighter">₹{state.zakahRes.wealth.payable.toLocaleString()}</h3>
-                   {!state.zakahRes.wealth.reached && (
-                     <p className="text-[10px] text-rose-400 font-bold uppercase mt-4 tracking-widest">Nisab not reached</p>
-                   )}
-                </div>
-              )}
+            <div className="bg-slate-900/40 p-12 rounded-[4rem] border border-white/10 space-y-12 shadow-2xl relative overflow-hidden">
+               <div className="absolute -top-10 -right-10 w-40 h-40 bg-emerald-500/5 rounded-full blur-3xl"></div>
+               <div className="grid grid-cols-1 gap-8">
+                  {[
+                    { key: 'cash', label: t.cashSavings },
+                    { key: 'gold', label: t.goldWeight },
+                    { key: 'business', label: t.businessStock }
+                  ].map(field => (
+                    <div key={field.key} className="space-y-3">
+                      <label className="text-[11px] font-black text-slate-500 uppercase tracking-[0.3em] ml-2">{field.label}</label>
+                      <input type="number" onChange={e => setState((s: any) => ({ ...s, zakahInputs: { ...s.zakahInputs, [field.key]: Number(e.target.value) } }))} className="w-full p-8 bg-slate-950 border border-white/10 rounded-[2.5rem] text-3xl font-black outline-none focus:ring-4 focus:ring-emerald-500/20 text-white transition-all shadow-inner" placeholder="0" />
+                    </div>
+                  ))}
+               </div>
+               <div className="p-12 bg-emerald-600/5 border-2 border-emerald-400/20 rounded-[3rem] text-center shadow-xl relative group">
+                  <div className="absolute top-0 right-0 p-4 opacity-10"><Award size={32} className="text-emerald-400" /></div>
+                  <span className="text-[11px] font-black text-emerald-400 uppercase tracking-[0.4em] block mb-6">Payable Zakah Amount</span>
+                  <h3 className="text-7xl font-black tracking-tighter text-white group-hover:scale-110 transition-transform">₹ {Math.max(0, (state.zakahInputs.cash + state.zakahInputs.gold * GOLD_PRICE_FIXED + state.zakahInputs.business) >= (NISAB_GOLD * GOLD_PRICE_FIXED) ? (state.zakahInputs.cash + state.zakahInputs.gold * GOLD_PRICE_FIXED + state.zakahInputs.business) * 0.025 : 0).toLocaleString()}</h3>
+               </div>
             </div>
           </div>
         )}
@@ -601,5 +491,8 @@ const App = () => {
   );
 };
 
-const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
-root.render(<App />);
+const rootEl = document.getElementById('root');
+if (rootEl) {
+  const root = createRoot(rootEl);
+  root.render(<App />);
+}
