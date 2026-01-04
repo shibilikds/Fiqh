@@ -1,45 +1,53 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shafi'i Fiqh - Inheritance & Zakah</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, viewport-fit=cover">
+    <title>Fiqh Hub - Shāfiʿī Inheritance & Zakath</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Amiri:wght@400;700&family=Noto+Sans+Malayalam:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #020617;
-            color: #f1f5f9;
+        body { 
+            font-family: 'Inter', 'Noto Sans Malayalam', sans-serif; 
+            background-color: #020617; 
+            color: #f1f5f9; 
+            overflow-x: hidden; 
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
         }
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            z-index: 50;
+        .arabic { font-family: 'Amiri', serif; }
+        .glass-card { 
+            background: rgba(15, 23, 42, 0.6); 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05); 
         }
-        .glass-card {
-            background: rgba(30, 41, 59, 0.4);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        .mahjub-card {
+            opacity: 0.5;
+            filter: grayscale(0.7);
+            background: rgba(15, 23, 42, 0.3);
+            border-style: dashed !important;
         }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
     </style>
-<script type="importmap">
+    <script type="importmap">
 {
   "imports": {
     "react": "https://esm.sh/react@18.3.1",
-    "react/": "https://esm.sh/react@18.3.1/",
     "react-dom": "https://esm.sh/react-dom@18.3.1",
-    "react-dom/": "https://esm.sh/react-dom@18.3.1/",
     "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
     "lucide-react": "https://esm.sh/lucide-react@0.424.0?external=react",
-    "recharts": "https://esm.sh/recharts@2.12.7?external=react,react-dom"
+    "react/": "https://esm.sh/react@18.3.1/",
+    "react-dom/": "https://esm.sh/react-dom@18.3.1/",
+    "recharts": "https://esm.sh/recharts@2.12.7"
   }
 }
 </script>
 </head>
-<body class="bg-[#020617] text-slate-100">
+<body>
     <div id="root"></div>
+    <script type="module" src="index.tsx"></script>
 </body>
 </html>

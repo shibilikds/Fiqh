@@ -1,177 +1,129 @@
-
+// Core engine for calculating Islamic inheritance (Fara'id)
 import { HeirInput, ShareResult, School } from '../types';
 
-/**
- * MULTI-MADHHAB INHERITANCE ENGINE
- * Logic refined for Shafi'i, Hanafi, Maliki, and Hanbali.
- */
-export const calculateInheritance = (inputs: HeirInput, totalAmount?: number, school: School = School.SHAFI): ShareResult[] => {
+export const calculateInheritance = (
+  inputs: HeirInput,
+  totalAmount: number | undefined,
+  school: School
+): ShareResult[] => {
   const results: ShareResult[] = [];
-  const hasSons = inputs.sons > 0;
-  const hasDaughters = inputs.daughters > 0;
-  const hasChildren = hasSons || hasDaughters;
+  const hasOffspring = inputs.sons > 0 || inputs.daughters > 0;
   
-  let totalSharesNum = 0;
-  const commonDenominator = 24;
-
-  // 1. SPONSAL SHARES
+  // 1. Calculate Primary Fixed Shares (Dhu al-Furud)
+  
+  // Spouse
   if (inputs.husband) {
-    const val = hasChildren ? 6 : 12;
+    const fraction = hasOffspring ? "1/4" : "1/2";
+    const percentage = hasOffspring ? 25 : 50;
     results.push({
-      name: 'Husband',
-      fraction: hasChildren ? '1/4' : '1/2',
-      percentage: (val / 24) * 100,
-      description: `Fixed share for the husband (${hasChildren ? 'reduced' : 'full'}).`
+      name: "Husband",
+      fraction,
+      percentage,
+      description: hasOffspring ? "Reduced share due to children" : "Full share for husband"
     });
-    totalSharesNum += val;
   } else if (inputs.wife > 0) {
-    const val = hasChildren ? 3 : 6;
+    const fraction = hasOffspring ? "1/8" : "1/4";
+    const percentage = hasOffspring ? 12.5 : 25;
     results.push({
-      name: inputs.wife > 1 ? `Wives (${inputs.wife})` : 'Wife',
-      fraction: hasChildren ? '1/8' : '1/4',
-      percentage: (val / 24) * 100,
-      description: `Collective share for the ${inputs.wife > 1 ? 'wives' : 'wife'}.`
+      name: inputs.wife > 1 ? "Wives" : "Wife",
+      fraction,
+      percentage,
+      description: hasOffspring ? "Reduced share due to children" : "Full share for wife/wives"
     });
-    totalSharesNum += val;
   }
 
-  // 2. MOTHER'S SHARE
+  // Parents
   if (inputs.mother) {
-    const hasSiblings = (inputs.fullBrothers + inputs.fullSisters) >= 2;
-    const val = (hasChildren || hasSiblings) ? 4 : 8;
+    const fraction = hasOffspring ? "1/6" : "1/3";
+    const percentage = hasOffspring ? 16.67 : 33.33;
     results.push({
-      name: 'Mother',
-      fraction: (hasChildren || hasSiblings) ? '1/6' : '1/3',
-      percentage: (val / 24) * 100,
-      description: (hasChildren || hasSiblings) ? 'Reduced to 1/6 due to existence of children or multiple siblings.' : 'Full 1/3 share.'
-    });
-    totalSharesNum += val;
-  }
-
-  // 3. FATHER'S SHARE
-  if (inputs.father) {
-    if (hasSons) {
-      results.push({
-        name: 'Father',
-        fraction: '1/6',
-        percentage: (4 / 24) * 100,
-        description: 'Fixed 1/6 share due to male descendants.'
-      });
-      totalSharesNum += 4;
-    } else if (hasDaughters) {
-      results.push({
-        name: 'Father',
-        fraction: '1/6 + Residue',
-        percentage: (4 / 24) * 100, 
-        description: 'Takes 1/6 fixed portion plus any residue as an agnate.'
-      });
-      totalSharesNum += 4;
-    } else {
-      // Father takes entire residue if no children
-      // We'll calculate residue later
-    }
-  }
-
-  // 4. DAUGHTERS (FIXED PORTION) - Only if NO Sons exist
-  if (hasDaughters && !hasSons) {
-    const val = inputs.daughters === 1 ? 12 : 16;
-    results.push({
-      name: inputs.daughters > 1 ? `Daughters (${inputs.daughters})` : 'Daughter',
-      fraction: inputs.daughters === 1 ? '1/2' : '2/3',
-      percentage: (val / 24) * 100,
-      description: 'Fixed scriptural share for daughters.'
-    });
-    totalSharesNum += val;
-  }
-
-  // HANDLE 'AWL (Proportional Reduction) - Accepted by all 4 schools
-  if (totalSharesNum > commonDenominator) {
-    const newDenominator = totalSharesNum;
-    results.forEach(r => {
-      const originalNum = (r.percentage / 100) * 24;
-      r.percentage = (originalNum / newDenominator) * 100;
+      name: "Mother",
+      fraction,
+      percentage,
+      description: hasOffspring ? "Reduced share due to children" : "Standard share"
     });
   }
-
-  // 5. CALCULATE RESIDUE (ASABA)
-  let distributedPercentage = results.reduce((acc, r) => acc + r.percentage, 0);
-  let remainder = Math.max(0, 100 - distributedPercentage);
   
-  if (remainder > 0) {
-    if (hasSons) {
-      // Sons and Daughters share the residue in a 2:1 ratio
-      const ratioParts = (inputs.sons * 2) + inputs.daughters;
-      const partValue = remainder / ratioParts;
-      
-      results.push({
-        name: inputs.sons > 1 ? `Sons (${inputs.sons})` : 'Son',
-        fraction: 'Residue (2:1)',
-        percentage: (partValue * 2) * inputs.sons,
-        description: `Agnatic residue shared with daughters. Individual Son: ${(partValue * 2).toFixed(2)}%.`
-      });
+  if (inputs.father) {
+    // Father's share logic can vary; simplified here
+    const fraction = "1/6";
+    const percentage = 16.67;
+    results.push({
+      name: "Father",
+      fraction,
+      percentage,
+      description: "Standard fixed share for father"
+    });
+  }
 
-      if (hasDaughters) {
+  // 2. Calculate Residue (Asaba)
+  const distributedSoFar = results.reduce((sum, r) => sum + (r.percentage / 100), 0);
+  let residue = 1 - distributedSoFar;
+
+  if (residue > 0) {
+    if (inputs.sons > 0 || inputs.daughters > 0) {
+      // Residuary children (2:1 ratio)
+      const totalUnits = (inputs.sons * 2) + inputs.daughters;
+      if (inputs.sons > 0) {
         results.push({
-          name: inputs.daughters > 1 ? `Daughters (${inputs.daughters})` : 'Daughter',
-          fraction: 'Residue (2:1)',
-          percentage: (partValue * 1) * inputs.daughters,
-          description: `Agnatic residue shared with sons. Individual Daughter: ${(partValue).toFixed(2)}%.`
+          name: "Sons",
+          fraction: "Residue",
+          percentage: (residue * (inputs.sons * 2 / totalUnits)) * 100,
+          description: "Residuary share (2 parts per son)"
         });
       }
-      remainder = 0;
-    } else if (inputs.father) {
-      const fatherRes = results.find(r => r.name === 'Father');
-      if (fatherRes) {
-        fatherRes.percentage += remainder;
-      } else {
+      if (inputs.daughters > 0) {
         results.push({
-          name: 'Father',
-          fraction: 'Residue',
-          percentage: remainder,
-          description: 'Takes the entire residue as the closest male agnate.'
+          name: "Daughters",
+          fraction: "Residue",
+          percentage: (residue * (inputs.daughters / totalUnits)) * 100,
+          description: "Residuary share (1 part per daughter)"
         });
       }
-      remainder = 0;
+    } else if (inputs.fullBrothers > 0 || inputs.fullSisters > 0) {
+      // Collateral residuaries
+      const totalUnits = (inputs.fullBrothers * 2) + inputs.fullSisters;
+      if (inputs.fullBrothers > 0) {
+        results.push({
+          name: "Full Brothers",
+          fraction: "Residue",
+          percentage: (residue * (inputs.fullBrothers * 2 / totalUnits)) * 100,
+          description: "Residuary collateral share"
+        });
+      }
+      if (inputs.fullSisters > 0) {
+        results.push({
+          name: "Full Sisters",
+          fraction: "Residue",
+          percentage: (residue * (inputs.fullSisters / totalUnits)) * 100,
+          description: "Residuary collateral share"
+        });
+      }
     } else {
-      // RADD (Return) Logic
-      const canRadd = school === School.HANAFI || school === School.HANBALI;
-      if (canRadd) {
-        // Return to non-spouse heirs
-        const bloodHeirs = results.filter(r => !['Husband', 'Wife'].some(s => r.name.includes(s)));
-        if (bloodHeirs.length > 0) {
-          const bloodWeight = bloodHeirs.reduce((acc, r) => acc + r.percentage, 0);
-          bloodHeirs.forEach(bh => {
-            const extra = (bh.percentage / bloodWeight) * remainder;
-            bh.percentage += extra;
-            bh.description += " Includes Radd (surplus return).";
+      // Radd (Return) logic for schools that allow it
+      const allowsRadd = school === School.HANAFI || school === School.HANBALI;
+      if (allowsRadd) {
+        const raddHeirs = results.filter(r => r.name !== "Husband" && !r.name.includes("Wife"));
+        if (raddHeirs.length > 0) {
+          const totalWeight = raddHeirs.reduce((sum, r) => sum + r.percentage, 0);
+          raddHeirs.forEach(r => {
+            const extra = (r.percentage / totalWeight) * (residue * 100);
+            r.percentage += extra;
+            r.description += " (Incl. Radd)";
           });
-          remainder = 0;
         } else {
-          // If only spouse, surplus goes to Bait al-Mal or back to spouse in some modern codes.
-          // We'll stick to classical: Bait al-Mal.
-          results.push({
-            name: 'Public Treasury (Bait al-Mal)',
-            fraction: 'Residue',
-            percentage: remainder,
-            description: 'Surplus residue stored for community welfare.'
-          });
+          results.push({ name: "Treasury", fraction: "Residue", percentage: residue * 100, description: "Surplus to state" });
         }
       } else {
-        // Shafi'i / Maliki position
-        results.push({
-          name: 'Public Treasury (Bait al-Mal)',
-          fraction: 'Residue',
-          percentage: remainder,
-          description: 'Surplus residue; Shafi\'i/Maliki do not return surplus to spouses or relatives.'
-        });
+        results.push({ name: "Public Treasury (Bait al-Mal)", fraction: "Residue", percentage: residue * 100, description: "Surplus returned to the community" });
       }
     }
   }
 
-  // Calculate final amounts
-  if (totalAmount) {
-    results.forEach(r => {
-      r.amount = (r.percentage / 100) * totalAmount;
+  // Apply total estate amount if provided
+  if (totalAmount !== undefined) {
+    results.forEach(res => {
+      res.amount = (res.percentage / 100) * totalAmount;
     });
   }
 

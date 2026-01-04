@@ -1,11 +1,11 @@
-
+// Types and enums for the Fiqh Hub application
 export enum Page {
   Home = 'home',
+  ZakahCalc = 'zakah-calc',
+  ZakahRules = 'zakah-rules',
   InheritanceCalc = 'inheritance-calc',
   InheritanceAmount = 'inheritance-amount',
-  ZakahCalc = 'zakah-calc',
   InheritanceRules = 'inheritance-rules',
-  ZakahRules = 'zakah-rules',
   Charts = 'charts',
   About = 'about'
 }
@@ -15,6 +15,10 @@ export enum School {
   HANAFI = 'hanafi',
   MALIKI = 'maliki',
   HANBALI = 'hanbali'
+}
+
+export interface GoldPrice {
+  price: number;
 }
 
 export interface HeirInput {
@@ -42,11 +46,4 @@ export interface ZakahInputs {
   silverWeight: number;
   businessAssets: number;
   debts: number;
-}
-
-export interface GoldPrice {
-  price: number;
-  currency: string;
-  unit: string;
-  timestamp: string;
 }
