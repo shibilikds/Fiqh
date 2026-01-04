@@ -1,10 +1,10 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import { 
   Scale, Calculator, Wallet, ArrowLeft, Plus, Minus, UserX, UserCheck, 
-  AlertTriangle, CheckCircle2, RefreshCcw, Layers, Info, User, 
-  Zap, BookOpen, FileText, ChevronRight, Award
+  AlertTriangle, RefreshCcw, Layers, User, Zap, BookOpen, FileText, 
+  ChevronRight, Award, BarChart3, PieChart as PieChartIcon, Info
 } from 'lucide-react';
 
 // --- UTILS ---
@@ -186,7 +186,7 @@ const runInheritanceEngine = (inputs: any, estate: number) => {
   let residueUnits = finalAsl - units;
   let hasJabar = false;
   if (residueUnits > 0) {
-    const asabahOrder = ['sons', 'grandsons', 'father', 'grandfather', 'fullBrothers', 'patBrothers', 'fullBroSon', 'patBroSon', 'fullPatUncle', 'patUncle'];
+    const asabahOrder = ['sons', 'grandsons', 'father', 'grandfather', 'fullBrothers', 'patBrothers'];
     const topAgnate = asabahOrder.find(id => active[id] > 0);
     if (topAgnate) {
       const partners: any = { 'sons': 'daughters', 'grandsons': 'granddaughters', 'fullBrothers': 'fullSisters', 'patBrothers': 'patSisters' };
@@ -213,6 +213,7 @@ const runInheritanceEngine = (inputs: any, estate: number) => {
   return { winners: results, losers: exclusions.map(e => ({ ...e, ...HEIR_DATA[e.id] })), awl: isAwl, hasJabar, methodologyML, methodologyEN };
 };
 
+// --- APP COMPONENT ---
 const App = () => {
   const [state, setState] = useState<any>({
     page: 'splash', lang: 'ml', deceasedGender: 'male', inheritanceInputs: {}, estate: 0, results: null,
@@ -230,7 +231,6 @@ const App = () => {
   if (state.page === 'splash') {
     return (
       <div className="fixed inset-0 bg-[#020617] flex flex-col items-center justify-center p-6 text-center animate-fade-in overflow-hidden">
-        <div className="star-field opacity-20 absolute inset-0"></div>
         <Scale size={80} className="text-blue-500 mb-8 animate-bounce" />
         <h1 className="text-6xl font-black text-white tracking-tighter uppercase mb-4">{t.title}</h1>
         <p className="text-blue-400 font-bold uppercase tracking-[0.4em] text-xs">{t.subtitle}</p>
@@ -267,13 +267,11 @@ const App = () => {
               <Calculator size={48} className="mb-6 text-blue-400 group-hover:scale-110 transition-transform" />
               <h2 className="text-4xl font-black uppercase tracking-tight">{t.inheritance}</h2>
               <p className="text-[11px] text-slate-500 font-bold uppercase mt-2 tracking-widest">Shafi'i 29-Heir Calculation</p>
-              <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-blue-500/5 rounded-full blur-3xl"></div>
             </button>
             <button onClick={() => setState((s: any) => ({ ...s, page: 'zakath' }))} className="p-12 lg:p-16 bg-slate-900/40 border border-white/10 rounded-[3.5rem] text-left hover:border-emerald-500/50 hover:bg-slate-900/60 transition-all group relative overflow-hidden">
               <Wallet size={48} className="mb-6 text-emerald-400 group-hover:scale-110 transition-transform" />
               <h2 className="text-4xl font-black uppercase tracking-tight">{t.zakath}</h2>
               <p className="text-[11px] text-slate-500 font-bold uppercase mt-2 tracking-widest">Nisab Threshold Checker</p>
-              <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-emerald-500/5 rounded-full blur-3xl"></div>
             </button>
           </div>
         )}
@@ -348,11 +346,9 @@ const App = () => {
                   <button onClick={() => setState((s: any) => ({ ...s, results: null }))} className="text-[10px] font-black uppercase text-slate-500 hover:text-white transition-colors bg-slate-900 px-6 py-3 rounded-2xl border border-white/10 shadow-lg flex items-center gap-2"><RefreshCcw size={16}/> {t.back}</button>
                 </div>
 
-                {/* SPECIAL CASE ALERTS */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {state.results.awl && (
                     <div className="p-10 bg-purple-500/10 border-2 border-purple-500/30 rounded-[3rem] flex items-start gap-6 shadow-[0_0_50px_rgba(168,85,247,0.15)] relative overflow-hidden group">
-                      <div className="absolute -right-5 -bottom-5 opacity-10 group-hover:scale-110 transition-transform"><Layers size={100} /></div>
                       <div className="p-4 bg-purple-500/20 rounded-2xl border border-purple-500/40"><Layers className="text-purple-400" size={32} /></div>
                       <div>
                         <h4 className="text-xl font-black uppercase tracking-tight text-purple-400 mb-2">{t.awlTitle}</h4>
@@ -362,7 +358,6 @@ const App = () => {
                   )}
                   {state.results.hasJabar && (
                     <div className="p-10 bg-amber-500/10 border-2 border-amber-500/30 rounded-[3rem] flex items-start gap-6 shadow-[0_0_50px_rgba(245,158,11,0.15)] relative overflow-hidden group">
-                      <div className="absolute -right-5 -bottom-5 opacity-10 group-hover:scale-110 transition-transform"><Zap size={100} /></div>
                       <div className="p-4 bg-amber-500/20 rounded-2xl border border-amber-500/40"><Zap className="text-amber-500" size={32} /></div>
                       <div>
                         <h4 className="text-xl font-black uppercase tracking-tight text-amber-500 mb-2">{t.jabarTitle}</h4>
@@ -415,7 +410,6 @@ const App = () => {
                   })}
                 </div>
 
-                {/* METHODOLOGY SECTION (PRINCIPLES / TEACHERS) */}
                 <div className="bg-slate-900/60 p-12 lg:p-16 rounded-[4rem] border border-white/10 space-y-10 shadow-2xl relative overflow-hidden">
                   <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none"><BookOpen size={180}/></div>
                   <div className="flex items-center gap-4 text-blue-400 border-b border-white/10 pb-8">
@@ -433,15 +427,14 @@ const App = () => {
                   </ul>
                 </div>
 
-                {/* EXCLUDED RELATIVES */}
                 {state.results.losers.length > 0 && (
                    <div className="space-y-8 pt-12 border-t border-white/10">
                     <h3 className="text-2xl font-black uppercase text-slate-500 flex items-center gap-4"><UserX className="text-rose-500" size={32}/> {t.mahjubTitle}</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                       {state.results.losers.map((r: any) => (
-                        <div key={r.id} className="p-8 bg-slate-900/20 border-2 border-white/5 border-dashed rounded-[3rem] opacity-60 flex flex-col justify-between h-44 hover:opacity-100 transition-all hover:bg-rose-500/5 group">
+                        <div key={r.id} className="p-8 bg-slate-900/20 border-2 border-white/5 border-dashed rounded-[3rem] opacity-60 flex flex-col justify-between h-44 hover:opacity-100 transition-all group">
                           <div>
-                            <span className="font-black text-xl text-slate-300 tracking-tight group-hover:text-white transition-colors">{r[state.lang]}</span>
+                            <span className="font-black text-xl text-slate-300 tracking-tight">{r[state.lang]}</span>
                             <p className="text-[10px] text-slate-600 font-bold uppercase mt-1 tracking-widest">{r.term}</p>
                           </div>
                           <div className="mt-4 py-2 px-4 bg-rose-500/10 rounded-xl border border-rose-500/20 flex items-center gap-2">
@@ -465,7 +458,6 @@ const App = () => {
               <h2 className="text-3xl font-black uppercase tracking-tighter">{t.zakath}</h2>
             </div>
             <div className="bg-slate-900/40 p-12 rounded-[4rem] border border-white/10 space-y-12 shadow-2xl relative overflow-hidden">
-               <div className="absolute -top-10 -right-10 w-40 h-40 bg-emerald-500/5 rounded-full blur-3xl"></div>
                <div className="grid grid-cols-1 gap-8">
                   {[
                     { key: 'cash', label: t.cashSavings },
@@ -479,9 +471,8 @@ const App = () => {
                   ))}
                </div>
                <div className="p-12 bg-emerald-600/5 border-2 border-emerald-400/20 rounded-[3rem] text-center shadow-xl relative group">
-                  <div className="absolute top-0 right-0 p-4 opacity-10"><Award size={32} className="text-emerald-400" /></div>
                   <span className="text-[11px] font-black text-emerald-400 uppercase tracking-[0.4em] block mb-6">Payable Zakah Amount</span>
-                  <h3 className="text-7xl font-black tracking-tighter text-white group-hover:scale-110 transition-transform">₹ {Math.max(0, (state.zakahInputs.cash + state.zakahInputs.gold * GOLD_PRICE_FIXED + state.zakahInputs.business) >= (NISAB_GOLD * GOLD_PRICE_FIXED) ? (state.zakahInputs.cash + state.zakahInputs.gold * GOLD_PRICE_FIXED + state.zakahInputs.business) * 0.025 : 0).toLocaleString()}</h3>
+                  <h3 className="text-7xl font-black tracking-tighter text-white">₹ {Math.max(0, (state.zakahInputs.cash + state.zakahInputs.gold * GOLD_PRICE_FIXED + state.zakahInputs.business) >= (NISAB_GOLD * GOLD_PRICE_FIXED) ? (state.zakahInputs.cash + state.zakahInputs.gold * GOLD_PRICE_FIXED + state.zakahInputs.business) * 0.025 : 0).toLocaleString()}</h3>
                </div>
             </div>
           </div>
@@ -491,6 +482,7 @@ const App = () => {
   );
 };
 
+// --- RENDER ---
 const rootEl = document.getElementById('root');
 if (rootEl) {
   const root = createRoot(rootEl);
