@@ -1,11 +1,12 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import { 
   Scale, Calculator, Wallet, ArrowLeft, Plus, Minus, UserX, UserCheck, 
   AlertTriangle, RefreshCcw, Layers, User, Zap, BookOpen, FileText, 
   ChevronRight, Award, BarChart3, Home as HomeIcon,
-  Coins, ChevronDown, Server, PieChart as PieIcon, ShieldCheck, Ghost
+  Coins, ChevronDown, Server, PieChart as PieIcon, ShieldCheck, Ghost,
+  TrendingUp, BookMarked, Info, CheckCircle2, Banknote, Users
 } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 
@@ -13,6 +14,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recha
 const GOLD_PRICE_FIXED = 6250; 
 const NISAB_GOLD = 85;
 
+// --- TYPES ---
 enum Page {
   Home = 'home',
   Inheritance = 'inheritance',
@@ -30,7 +32,6 @@ const TRANSLATIONS: any = {
     mahjubTitle: "Excluded Relatives (Mahjub)", awlTitle: "Al-Awl (Increase) Detected",
     awlDesc: "Total shares exceeded the base. Fractions are proportionally reduced. Affected heirs highlighted in Purple.",
     jabarTitle: "Jabar Case Detected", jabarDesc: "Male relative forced female into residue (Asabah) instead of her fixed share. Highlighted in Amber.",
-    doubleCheckTitle: "Confirm Data", doubleCheckMsg: "Please verify all heir counts and the total estate before generating the report.",
     confirmBtn: "Generate Results", cancelBtn: "Cancel", deceasedGender: "Deceased Gender",
     male: "Male", female: "Female",
     detailedSummary: "Jurisprudential Methodology", methodologyDesc: "Breakdown of the Fiqh logic used for this case:",
@@ -64,7 +65,7 @@ const TRANSLATIONS: any = {
   }
 };
 
-// --- THE 29 HEIRS DATA ---
+// --- THE FULL 29 HEIRS ---
 const HEIR_DATA: any = {
   husband: { term: "Az-Zawj", en: "Husband", ml: "ഭർത്താവ്", cat: "descendants", max: 1 },
   wife: { term: "Az-Zawjah", en: "Wife", ml: "ഭാര്യ", cat: "descendants", max: 4 },
@@ -72,25 +73,29 @@ const HEIR_DATA: any = {
   daughters: { term: "Al-Bint", en: "Daughter", ml: "മകൾ", cat: "descendants", max: 20 },
   grandSons: { term: "Ibn al-Ibn", en: "Grandson (S.S)", ml: "മകൻറെ മകൻ", cat: "descendants", max: 20 },
   grandDaughters: { term: "Bint al-Ibn", en: "Granddaughter (S.D)", ml: "മകൻറെ മകൾ", cat: "descendants", max: 20 },
+  grandGrandSons: { term: "Ibn Ibn al-Ibn", en: "G-Grandson", ml: "മകൻറെ മകൻറെ മകൻ", cat: "descendants", max: 20 },
   father: { term: "Al-Ab", en: "Father", ml: "പിതാവ്", cat: "ancestors", max: 1 },
   mother: { term: "Al-Umm", en: "Mother", ml: "മാതാവ്", cat: "ancestors", max: 1 },
-  pGrandfather: { term: "Al-Jadd", en: "Paternal Grandfather", ml: "പിതാമഹൻ", cat: "ancestors", max: 1 },
-  pGrandmother: { term: "Al-Jaddah", en: "Paternal Grandmother", ml: "പിതാവിൻറെ ഉമ്മ", cat: "ancestors", max: 1 },
-  mGrandmother: { term: "Al-Jaddah", en: "Maternal Grandmother", ml: "മാതാവിൻറെ ഉമ്മ", cat: "ancestors", max: 1 },
+  pGrandfather: { term: "Al-Jadd al-Sahih", en: "Pat. Grandfather", ml: "പിതാമഹൻ", cat: "ancestors", max: 1 },
+  pGrandmother: { term: "Al-Jaddah", en: "Pat. Grandmother", ml: "പിതാവിൻറെ ഉമ്മ", cat: "ancestors", max: 1 },
+  mGrandmother: { term: "Al-Jaddah", en: "Mat. Grandmother", ml: "മാതാവിൻറെ ഉമ്മ", cat: "ancestors", max: 1 },
+  pGGrandfather: { term: "Al-Jadd al-A'la", en: "Pat. G-Grandfather", ml: "പിതാവിൻറെ പിതാമഹൻ", cat: "ancestors", max: 1 },
   fullBrothers: { term: "Al-Akh Shaqiq", en: "Full Brother", ml: "സഹോദരൻ", cat: "siblings", max: 20 },
   fullSisters: { term: "Al-Ukht Shaqiqah", en: "Full Sister", ml: "സഹോദരി", cat: "siblings", max: 20 },
-  consBrothers: { term: "Al-Akh li-Ab", en: "Consanguine Brother", ml: "പിതാവൊത്ത സഹോദരൻ", cat: "siblings", max: 20 },
-  consSisters: { term: "Al-Ukht li-Ab", en: "Consanguine Sister", ml: "പിതാവൊത്ത സഹോദരി", cat: "siblings", max: 20 },
+  consBrothers: { term: "Al-Akh li-Ab", en: "Cons. Brother", ml: "പിതാവൊത്ത സഹോദരൻ", cat: "siblings", max: 20 },
+  consSisters: { term: "Al-Ukht li-Ab", en: "Cons. Sister", ml: "പിതാവൊത്ത സഹോദരി", cat: "siblings", max: 20 },
   uterBrothers: { term: "Al-Akh li-Umm", en: "Uterine Brother", ml: "മാതാവൊത്ത സഹോദരൻ", cat: "siblings", max: 20 },
   uterSisters: { term: "Al-Ukht li-Umm", en: "Uterine Sister", ml: "മാതാവൊത്ത സഹോദരി", cat: "siblings", max: 20 },
-  fBroSon: { term: "Ibn Akh Shaqiq", en: "Full Bro's Son", ml: "സഹോദര പുത്രൻ", cat: "extended", max: 20 },
-  cBroSon: { term: "Ibn Akh li-Ab", en: "Cons. Bro's Son", ml: "പിതാവൊത്ത സഹോദരപുത്രൻ", cat: "extended", max: 20 },
-  fPatUncle: { term: "Al-Amm Shaqiq", en: "Full Paternal Uncle", ml: "പിതാവിൻറെ സഹോദരൻ", cat: "extended", max: 20 },
-  cPatUncle: { term: "Al-Amm li-Ab", en: "Cons. Paternal Uncle", ml: "പിതാവിൻറെ പിതാവൊത്ത സഹോദരൻ", cat: "extended", max: 20 },
-  fPatUncleSon: { term: "Ibn Amm Shaqiq", en: "Full Uncle's Son", ml: "പിതാവിൻറെ സഹോദരപുത്രൻ", cat: "extended", max: 20 },
-  cPatUncleSon: { term: "Ibn Amm li-Ab", en: "Cons. Uncle's Son", ml: "അമ്മാവൻറെ മകൻ (Cons)", cat: "extended", max: 20 },
+  fBroSon: { term: "Ibn al-Akh Shaqiq", en: "Full Bro's Son", ml: "സഹോദര പുത്രൻ", cat: "extended", max: 20 },
+  cBroSon: { term: "Ibn al-Akh li-Ab", en: "Cons. Bro's Son", ml: "പിതാവൊത്ത സഹോദരപുത്രൻ", cat: "extended", max: 20 },
+  fPatUncle: { term: "Al-Amm Shaqiq", en: "Full Pat. Uncle", ml: "പിതാവിൻറെ സഹോദരൻ", cat: "extended", max: 20 },
+  cPatUncle: { term: "Al-Amm li-Ab", en: "Cons. Pat. Uncle", ml: "പിതാവിൻറെ പിതാവൊത്ത സഹോദരൻ", cat: "extended", max: 20 },
+  fPatUncleSon: { term: "Ibn al-Amm Shaqiq", en: "Full Uncle's Son", ml: "അമ്മാവൻറെ മകൻ", cat: "extended", max: 20 },
+  cPatUncleSon: { term: "Ibn al-Amm li-Ab", en: "Cons. Uncle's Son", ml: "അമ്മാവൻറെ മകൻ (Cons)", cat: "extended", max: 20 },
+  fBroSonSon: { term: "Ibn Ibn Akh Shaqiq", en: "F-Bro G-Son", ml: "സഹോദരൻറെ മകൻറെ മകൻ", cat: "extended", max: 20 },
   mEmancipator: { term: "Al-Mu'tiq", en: "Male Emancipator", ml: "അടിമയെ മോചിപ്പിച്ച പുരുഷൻ", cat: "extended", max: 1 },
-  fEmancipator: { term: "Al-Mu'tiqah", en: "Female Emancipator", ml: "അടിമയെ മോചിപ്പിച്ച സ്ത്രീ", cat: "extended", max: 1 }
+  fEmancipator: { term: "Al-Mu'tiqah", en: "Fem. Emancipator", ml: "അടിമയെ മോചിപ്പിച്ച സ്ത്രീ", cat: "extended", max: 1 },
+  baitAlMal: { term: "Bait al-Mal", en: "Public Treasury", ml: "ബൈത്തുൽമാൽ", cat: "extended", max: 1 }
 };
 
 // --- UTILS ---
@@ -98,7 +103,7 @@ const gcd = (a: number, b: number): number => b === 0 ? a : gcd(b, a % b);
 const lcm = (a: number, b: number): number => (a * b) / gcd(a, b);
 const getLCMOfArray = (arr: number[]): number => arr.length === 0 ? 1 : arr.reduce((acc, val) => lcm(acc, val), 1);
 
-// --- ENGINE ---
+// --- INHERITANCE ENGINE ---
 const runInheritanceEngine = (inputs: any, estate: number) => {
   const h = (id: string) => inputs[id] || 0;
   let rawResults: any[] = [];
@@ -108,67 +113,55 @@ const runInheritanceEngine = (inputs: any, estate: number) => {
   
   const addExcl = (id: string, blocker: string) => { 
     if (h(id) > 0) {
-      exclusions.push({ id, blockedBy: HEIR_DATA[blocker]?.term || blocker, blockerNameEn: HEIR_DATA[blocker].en, blockerNameMl: HEIR_DATA[blocker].ml });
+      exclusions.push({ 
+        id, 
+        blockedBy: HEIR_DATA[blocker]?.term || blocker, 
+        blockerNameEn: HEIR_DATA[blocker]?.en || blocker, 
+        blockerNameMl: HEIR_DATA[blocker]?.ml || blocker 
+      });
       methodologyML.push(`${HEIR_DATA[id].ml} ഹജ്ബ് ചെയ്യപ്പെട്ടു (${HEIR_DATA[blocker].ml} ഉള്ളതിനാൽ).`);
       methodologyEN.push(`${HEIR_DATA[id].en} is excluded (Mahjub) because of ${HEIR_DATA[blocker].en}.`);
     }
   };
   
-  const hasDesc = (h('sons') + h('daughters') + h('grandSons') + h('grandDaughters')) > 0;
-  const hasMaleDesc = (h('sons') + h('grandSons')) > 0;
+  const hasDesc = (h('sons') + h('daughters') + h('grandSons') + h('grandDaughters') + h('grandGrandSons')) > 0;
+  const hasMaleDesc = (h('sons') + h('grandSons') + h('grandGrandSons')) > 0;
   const sibCount = (h('fullBrothers') + h('fullSisters') + h('consBrothers') + h('consSisters') + h('uterBrothers') + h('uterSisters'));
 
   const active = { ...inputs };
   
-  // --- HAJB (EXCLUSION) LOGIC ---
+  // HAJB LOGIC
   if (h('sons') > 0) {
-    ['grandSons', 'grandDaughters', 'fullBrothers', 'fullSisters', 'consBrothers', 'consSisters', 'uterBrothers', 'uterSisters', 'fBroSon', 'cBroSon', 'fPatUncle', 'cPatUncle', 'fPatUncleSon', 'cPatUncleSon'].forEach(id => addExcl(id, 'sons'));
+    ['grandSons', 'grandDaughters', 'grandGrandSons', 'fullBrothers', 'fullSisters', 'consBrothers', 'consSisters', 'uterBrothers', 'uterSisters', 'fBroSon', 'cBroSon', 'fPatUncle', 'cPatUncle', 'fPatUncleSon', 'cPatUncleSon', 'fBroSonSon'].forEach(id => addExcl(id, 'sons'));
   }
   if (h('grandSons') > 0 && h('sons') === 0) {
-    ['fullBrothers', 'fullSisters', 'consBrothers', 'consSisters', 'uterBrothers', 'uterSisters', 'fBroSon', 'cBroSon', 'fPatUncle', 'cPatUncle', 'fPatUncleSon', 'cPatUncleSon'].forEach(id => addExcl(id, 'grandSons'));
+    ['grandGrandSons', 'fullBrothers', 'fullSisters', 'consBrothers', 'consSisters', 'uterBrothers', 'uterSisters', 'fBroSon', 'cBroSon', 'fPatUncle', 'cPatUncle', 'fPatUncleSon', 'cPatUncleSon'].forEach(id => addExcl(id, 'grandSons'));
   }
   if (h('father') > 0) {
-    ['pGrandfather', 'fullBrothers', 'fullSisters', 'consBrothers', 'consSisters', 'uterBrothers', 'uterSisters', 'fBroSon', 'cBroSon', 'fPatUncle', 'cPatUncle', 'fPatUncleSon', 'cPatUncleSon'].forEach(id => addExcl(id, 'father'));
+    ['pGrandfather', 'pGGrandfather', 'fullBrothers', 'fullSisters', 'consBrothers', 'consSisters', 'uterBrothers', 'uterSisters', 'fBroSon', 'cBroSon', 'fPatUncle', 'cPatUncle', 'fPatUncleSon', 'cPatUncleSon'].forEach(id => addExcl(id, 'father'));
   }
   if (h('mother') > 0) {
     ['pGrandmother', 'mGrandmother'].forEach(id => addExcl(id, 'mother'));
   }
-  if (h('fullBrothers') > 0 || hasMaleDesc || h('father') > 0) {
-    ['consBrothers', 'consSisters', 'fBroSon', 'cBroSon', 'fPatUncle', 'cPatUncle', 'fPatUncleSon', 'cPatUncleSon'].forEach(id => {
-       if (h(id) > 0 && !exclusions.find(ex => ex.id === id)) {
-          const blocker = h('sons') > 0 ? 'sons' : h('father') > 0 ? 'father' : 'fullBrothers';
-          addExcl(id, blocker);
-       }
-    });
-  }
 
   exclusions.forEach(e => active[e.id] = 0);
 
-  // --- FRACTION CALCULATION ---
+  // SHARES
   if (active.husband) {
-    const d = hasDesc ? 4 : 2;
-    rawResults.push({ id: 'husband', num: 1, den: d, type: 'fixed' });
+    rawResults.push({ id: 'husband', num: 1, den: hasDesc ? 4 : 2, type: 'fixed' });
   } else if (active.wife > 0) {
-    const d = hasDesc ? 8 : 4;
-    rawResults.push({ id: 'wife', num: 1, den: d, type: 'fixed' });
+    rawResults.push({ id: 'wife', num: 1, den: hasDesc ? 8 : 4, type: 'fixed' });
   }
-
   if (active.mother) {
-    const d = (hasDesc || sibCount >= 2) ? 6 : 3;
-    rawResults.push({ id: 'mother', num: 1, den: d, type: 'fixed' });
+    rawResults.push({ id: 'mother', num: 1, den: (hasDesc || sibCount >= 2) ? 6 : 3, type: 'fixed' });
   }
-
   if (active.father && hasMaleDesc) {
     rawResults.push({ id: 'father', num: 1, den: 6, type: 'fixed' });
   }
-
   if (active.daughters > 0 && active.sons === 0) {
-    const n = active.daughters === 1 ? 1 : 2;
-    const d = active.daughters === 1 ? 2 : 3;
-    rawResults.push({ id: 'daughters', num: n, den: d, type: 'fixed' });
+    rawResults.push({ id: 'daughters', num: active.daughters === 1 ? 1 : 2, den: active.daughters === 1 ? 2 : 3, type: 'fixed' });
   }
 
-  // AWL Check
   const baseAsl = getLCMOfArray(rawResults.map(r => r.den || 1));
   let units = 0;
   rawResults.forEach(r => units += (baseAsl / r.den) * r.num);
@@ -184,15 +177,12 @@ const runInheritanceEngine = (inputs: any, estate: number) => {
     amount: estate ? ((((baseAsl / r.den) * r.num) / finalAsl) * estate) : 0
   }));
 
-  // ASABAH (Residue)
   let residueUnits = finalAsl - units;
-  let hasJabar = false;
   if (residueUnits > 0) {
-    const topAgnate = ['sons', 'father', 'grandSons', 'fullBrothers', 'consBrothers', 'fBroSon', 'cBroSon', 'fPatUncle', 'cPatUncle'].find(id => active[id] > 0);
+    const topAgnate = ['sons', 'father', 'grandSons', 'fullBrothers', 'consBrothers', 'fBroSon', 'cBroSon', 'fPatUncle'].find(id => active[id] > 0);
     if (topAgnate) {
-      const pId = topAgnate === 'sons' ? 'daughters' : topAgnate === 'fullBrothers' ? 'fullSisters' : topAgnate === 'consBrothers' ? 'consSisters' : null;
+      const pId = topAgnate === 'sons' ? 'daughters' : topAgnate === 'fullBrothers' ? 'fullSisters' : null;
       if (pId && active[pId] > 0) {
-        hasJabar = true;
         const totalU = active[topAgnate] * 2 + active[pId];
         const resMale = (residueUnits / finalAsl) * (active[topAgnate] * 2 / totalU);
         const resFemale = (residueUnits / finalAsl) * (active[pId] / totalU);
@@ -201,13 +191,15 @@ const runInheritanceEngine = (inputs: any, estate: number) => {
       } else {
         results.push({ id: topAgnate, ...HEIR_DATA[topAgnate], f: 'Asabah', p: (residueUnits / finalAsl) * 100, tag: 'asabah', amount: estate ? ((residueUnits / finalAsl) * estate) : 0 });
       }
+    } else {
+       results.push({ id: 'baitAlMal', ...HEIR_DATA['baitAlMal'], f: 'Residue', p: (residueUnits / finalAsl) * 100, tag: 'asabah', amount: estate ? ((residueUnits / finalAsl) * estate) : 0 });
     }
   }
 
-  return { winners: results, losers: exclusions.map(e => ({ ...e, ...HEIR_DATA[e.id] })), awl: isAwl, hasJabar, methodologyML, methodologyEN };
+  return { winners: results, losers: exclusions.map(e => ({ ...e, ...HEIR_DATA[e.id] })), awl: isAwl, hasJabar: !!results.find(r => r.tag === 'jabar'), methodologyML, methodologyEN };
 };
 
-// --- MAIN APP ---
+// --- APP COMPONENT ---
 const App = () => {
   const [page, setPage] = useState(Page.Home);
   const [lang, setLang] = useState('en'); 
@@ -228,7 +220,7 @@ const App = () => {
 
   return (
     <div className="min-h-screen bg-[#020617] text-slate-100 flex flex-col lg:flex-row font-sans selection:bg-blue-500/30">
-      {/* Desktop Sidebar */}
+      {/* Sidebar */}
       <aside className="hidden lg:flex flex-col w-72 bg-slate-950 border-r border-white/5 sticky top-0 h-screen p-8 shrink-0">
         <div className="mb-12">
           <h1 className="text-3xl font-black tracking-tighter bg-gradient-to-br from-blue-400 to-cyan-400 bg-clip-text text-transparent">{t.title}</h1>
@@ -255,7 +247,7 @@ const App = () => {
         </div>
       </aside>
 
-      {/* Main Content Area */}
+      {/* Main content */}
       <main className="flex-grow p-4 lg:p-12 max-w-6xl mx-auto w-full pb-32 lg:pb-12 overflow-x-hidden">
         <header className="lg:hidden flex justify-between items-center mb-10">
           <h1 className="text-2xl font-black text-blue-400 tracking-tighter">{t.title}</h1>
@@ -311,7 +303,6 @@ const App = () => {
                   </div>
                 </div>
 
-                {/* Categories */}
                 {Object.keys(t.categories).map(catKey => (
                   <div key={catKey} className="space-y-6">
                     <h3 className="text-xs font-black text-blue-400 uppercase tracking-[0.4em] ml-6">{t.categories[catKey]}</h3>
@@ -339,23 +330,6 @@ const App = () => {
                   <button onClick={() => setResults(null)} className="p-4 bg-slate-900 rounded-2xl border border-white/10 text-slate-400 hover:text-white flex items-center gap-2 text-[10px] font-black uppercase"><RefreshCcw size={16}/> {t.back}</button>
                 </div>
 
-                {/* Alerts */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {results.awl && (
-                    <div className="p-10 bg-purple-500/10 border-2 border-purple-500/30 rounded-[3.5rem] flex gap-8 items-center shadow-xl">
-                      <Layers className="text-purple-400 shrink-0" size={48} />
-                      <div><h4 className="text-2xl font-black text-purple-400 mb-2 uppercase">{t.awlTitle}</h4><p className="text-sm text-slate-300">{t.awlDesc}</p></div>
-                    </div>
-                  )}
-                  {results.hasJabar && (
-                    <div className="p-10 bg-amber-500/10 border-2 border-amber-500/30 rounded-[3.5rem] flex gap-8 items-center shadow-xl">
-                      <Zap className="text-amber-500 shrink-0" size={48} />
-                      <div><h4 className="text-2xl font-black text-amber-500 mb-2 uppercase">{t.jabarTitle}</h4><p className="text-sm text-slate-300">{t.jabarDesc}</p></div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Heir Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                   {results.winners.map((r: any) => {
                     const isAmber = r.highlight === 'amber';
@@ -363,8 +337,8 @@ const App = () => {
                     const tag = isAmber ? t.jabarTag : isPurple ? t.awlTag : r.tag === 'asabah' ? t.asabahTag : t.fixedTag;
                     const tagColor = isAmber ? 'bg-amber-400' : isPurple ? 'bg-purple-500' : 'bg-blue-600';
                     return (
-                      <div key={r.id} className={`p-10 bg-slate-900/40 rounded-[4rem] border-2 relative overflow-hidden transition-all hover:scale-[1.03] shadow-2xl ${isAmber ? 'border-amber-500/40 shadow-amber-500/5' : isPurple ? 'border-purple-500/40 shadow-purple-500/5' : 'border-white/5'}`}>
-                        <div className={`absolute top-0 right-0 px-6 py-2 ${tagColor} text-slate-900 font-black text-[10px] uppercase tracking-widest rounded-bl-[2rem] z-10 shadow-lg`}>{tag}</div>
+                      <div key={r.id} className={`p-10 bg-slate-900/40 rounded-[4rem] border-2 relative overflow-hidden shadow-2xl ${isAmber ? 'border-amber-500/40' : isPurple ? 'border-purple-500/40' : 'border-white/5'}`}>
+                        <div className={`absolute top-0 right-0 px-6 py-2 ${tagColor} text-slate-900 font-black text-[10px] uppercase tracking-widest rounded-bl-[2rem]`}>{tag}</div>
                         <h4 className="text-3xl font-black mb-1 text-white tracking-tight">{r[lang]}</h4>
                         <p className="text-[11px] text-slate-500 font-bold uppercase mb-10 tracking-[0.2em]">{r.term}</p>
                         <div className="flex justify-between items-baseline mb-8">
@@ -380,7 +354,6 @@ const App = () => {
                   })}
                 </div>
 
-                {/* RESTORED MAHJUB SYSTEM */}
                 {results.losers.length > 0 && (
                   <div className="space-y-8 animate-fade-in">
                     <h3 className="text-4xl font-black uppercase text-rose-500 flex items-center gap-6 tracking-tighter"><Ghost size={40}/> {t.mahjubTitle}</h3>
@@ -403,20 +376,6 @@ const App = () => {
                     </div>
                   </div>
                 )}
-
-                {/* Methodology Breakdown */}
-                <div className="bg-slate-900/60 p-12 lg:p-20 rounded-[4rem] border border-white/10 space-y-12 shadow-2xl relative overflow-hidden">
-                  <div className="absolute top-0 right-0 p-20 opacity-5 pointer-events-none"><FileText size={180}/></div>
-                  <h3 className="text-4xl font-black uppercase text-blue-400 flex items-center gap-6 tracking-tighter"><FileText size={36}/> {t.detailedSummary}</h3>
-                  <ul className="space-y-6">
-                    {(lang === 'ml' ? results.methodologyML : results.methodologyEN).map((step: string, i: number) => (
-                      <li key={i} className="flex gap-8 items-start bg-slate-950/60 p-8 rounded-[2.5rem] border border-white/5 shadow-inner hover:border-blue-500/20 transition-all">
-                        <div className="w-12 h-12 rounded-2xl bg-blue-600/10 border border-blue-400/20 flex items-center justify-center shrink-0 font-black text-blue-400 text-lg shadow-xl">{i+1}</div>
-                        <p className="text-slate-200 font-medium text-lg leading-relaxed tracking-tight">{step}</p>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
               </div>
             )}
           </div>
@@ -424,7 +383,7 @@ const App = () => {
 
         {page === Page.Zakah && (
           <div className="max-w-2xl mx-auto space-y-12 animate-fade-in py-10">
-            <div className="bg-slate-900/40 p-12 lg:p-16 rounded-[4rem] border border-white/10 space-y-12 shadow-2xl">
+             <div className="bg-slate-900/40 p-12 lg:p-16 rounded-[4rem] border border-white/10 space-y-12 shadow-2xl">
               <div className="space-y-10">
                 {[
                   { id: 'cash', label: t.cashSavings, icon: <Coins size={24}/> },
@@ -452,13 +411,13 @@ const App = () => {
              <div className="max-w-2xl mx-auto space-y-6">
               <div className="inline-block p-10 bg-blue-500/10 rounded-[3rem] border border-blue-400/20 shadow-2xl mb-4"><BarChart3 size={64} className="text-blue-400" /></div>
               <h2 className="text-6xl font-black uppercase tracking-tighter leading-none">Analytics</h2>
-              <p className="text-slate-500 font-black tracking-[0.4em] uppercase text-xs italic">Sunni Methodology Visualization</p>
+              <p className="text-slate-500 font-black tracking-[0.4em] uppercase text-xs italic">Shāfiʿī Methodology Visualization</p>
             </div>
           </div>
         )}
       </main>
 
-      {/* Mobile Footer Nav */}
+      {/* Mobile Nav */}
       <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-slate-950/95 backdrop-blur-2xl border-t border-white/10 flex justify-around items-center py-5 z-50 shadow-2xl">
         {[
           { id: Page.Home, icon: <HomeIcon size={24}/>, label: t.home },
