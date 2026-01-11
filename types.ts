@@ -1,3 +1,4 @@
+
 // Types and enums for the Fiqh Hub application
 export enum Page {
   Home = 'home',
@@ -17,27 +18,73 @@ export enum School {
   HANBALI = 'hanbali'
 }
 
-export interface GoldPrice {
-  price: number;
+export enum Language {
+  EN = 'en',
+  ML = 'ml',
+  AR = 'ar'
 }
 
+// All possible heirs for the engine
 export interface HeirInput {
-  husband: boolean;
-  wife: number;
-  father: boolean;
-  mother: boolean;
-  sons: number;
-  daughters: number;
-  fullBrothers: number;
-  fullSisters: number;
+  [key: string]: number;
+  husband?: number;
+  wife?: number;
+  sons?: number;
+  daughters?: number;
+
+  father?: number;
+  mother?: number;
+  grandSons?: number;
+  grandDaughters?: number;
+  pGrandfather?: number;
+  pGrandmother?: number;
+  mGrandmother?: number;
+  fullBrothers?: number;
+  fullSisters?: number;
+  consBrothers?: number; // Consanguine
+  consSisters?: number;
+  uterBrothers?: number; // Uterine
+  uterSisters?: number;
+
+  // Added based on user request for more heirs
+  fullBrotherSon?: number;
+  consBrotherSon?: number; // Paternal half-brother's son
+  fullPaternalUncle?: number;
+  consPaternalUncle?: number; // Father's consanguine brother
+  fullPaternalUncleSon?: number;
+  consPaternalUncleSon?: number;
+  maleEmancipator?: number;
+  femaleEmancipator?: number;
 }
+
 
 export interface ShareResult {
+  id: string;
   name: string;
-  fraction: string;
+  count: number;
+  shareType: 'Fard' | 'Asabah' | 'Mahjub' | 'Residue';
+  baseFraction: string;
+  finalFraction: string;
   percentage: number;
   amount?: number;
-  description: string;
+  reason: string;
+  blockedBy?: string;
+  blockerName?: string;
+  isRaddRecipient?: boolean;
+}
+
+export interface CalculationResult {
+  winners: ShareResult[];
+  losers: ShareResult[];
+  awl: boolean;
+  radd: boolean;
+  asl: number;
+  finalAsl: number;
+}
+
+
+export interface GoldPrice {
+  price: number;
 }
 
 export interface ZakahInputs {

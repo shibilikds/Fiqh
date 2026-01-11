@@ -2,29 +2,26 @@
 import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import { GitGraph, ArrowRight, Layers, BarChart3, ChevronDown } from 'lucide-react';
-// Correctly import School type to support the new prop
-import { School } from '../types';
+import { School, Language } from '../types';
+import { t } from '../services/translations';
 
 interface ChartsProps {
   school: School;
+  language: Language;
 }
 
-const Charts: React.FC<ChartsProps> = ({ school }) => {
-  // Extract school name for UI labels
-  const schoolName = school.charAt(0).toUpperCase() + school.slice(1);
+const Charts: React.FC<ChartsProps> = ({ school, language }) => {
+  const schoolName = t(`school.${school}`, language);
   
   const exampleInheritanceData = [
-    { name: 'Spouse (Fixed)', value: 25 },
-    { name: 'Mother (Fixed)', value: 16.67 },
-    { name: 'Father (Fixed)', value: 16.67 },
-    { name: 'Son (Residue)', value: 27.77 },
-    { name: 'Daughter (Residue)', value: 13.89 },
+    { name: t('charts.heir_spouse', language), value: 25 },
+    { name: t('charts.heir_mother', language), value: 16.67 },
+    { name: t('charts.heir_father', language), value: 16.67 },
+    { name: t('charts.heir_son', language), value: 27.77 },
+    { name: t('charts.heir_daughter', language), value: 13.89 },
   ];
 
-  // Neon palette for charts
   const COLORS = ['#60A5FA', '#818CF8', '#C084FC', '#2DD4BF', '#FBBF24'];
-
-  // Determine Madhhab-specific logic for visualization text
   const allowsDebtDeduction = school === School.HANAFI || school === School.HANBALI;
 
   return (
@@ -33,18 +30,16 @@ const Charts: React.FC<ChartsProps> = ({ school }) => {
         <div className="inline-block p-6 bg-blue-500/10 rounded-[2rem] mb-6 border border-blue-400/20 shadow-xl">
           <BarChart3 className="text-blue-400" size={40} />
         </div>
-        <h2 className="text-3xl lg:text-5xl font-black text-white uppercase tracking-tighter">Visual Analytics</h2>
-        {/* Dynamic Madhhab Label */}
-        <p className="text-[10px] lg:text-xs text-slate-500 font-black tracking-[0.4em] mt-3 uppercase">{schoolName} Statistical Logic</p>
+        <h2 className="text-3xl lg:text-5xl font-black text-white uppercase tracking-tighter">{t('charts.title', language)}</h2>
+        <p className="text-[10px] lg:text-xs text-slate-500 font-black tracking-[0.4em] mt-3 uppercase">{t('charts.subtitle', language, { schoolName })}</p>
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 lg:gap-12">
-        {/* Pie Chart Card */}
         <div className="bg-slate-900/40 backdrop-blur-xl p-8 lg:p-12 rounded-[2.5rem] shadow-2xl border border-white/10 relative overflow-hidden flex flex-col">
           <div className="absolute -top-10 -left-10 w-48 h-48 bg-blue-500/5 rounded-full blur-3xl"></div>
           <h3 className="text-sm font-black text-slate-300 mb-10 flex items-center uppercase tracking-[0.2em] relative z-10">
             <Layers className="mr-4 text-blue-400" size={20} />
-            Fractional Distribution
+            {t('charts.dist_title', language)}
           </h3>
           <div className="h-[350px] w-full relative z-10">
             <ResponsiveContainer width="100%" height="100%">
@@ -87,25 +82,23 @@ const Charts: React.FC<ChartsProps> = ({ school }) => {
             </ResponsiveContainer>
           </div>
           <p className="text-[10px] text-slate-500 mt-8 font-black uppercase tracking-widest text-center italic relative z-10">
-            * Sample Dataset: Spouse, Mother, Father, 1 Son, 1 Daughter.
+            {t('charts.dist_sample_note', language)}
           </p>
         </div>
 
-        {/* Process Flow Card */}
         <div className="bg-slate-900/40 backdrop-blur-xl p-8 lg:p-12 rounded-[2.5rem] shadow-2xl border border-white/10 flex flex-col">
           <h3 className="text-sm font-black text-slate-300 mb-10 flex items-center uppercase tracking-[0.2em]">
             <GitGraph className="mr-4 text-indigo-400" size={20} />
-            Zakah Algorithmic Logic
+            {t('charts.zakah_logic_title', language)}
           </h3>
           <div className="flex-grow flex flex-col justify-center space-y-6 lg:space-y-8">
-            <FlowStep label="Identify Zakatable Asset Pool" />
+            <FlowStep label={t('charts.flow_step1', language)} />
             <div className="flex justify-center"><ChevronDown className="text-slate-800" size={24} /></div>
-            {/* Dynamic Logic Step Based on Madhhab */}
-            <FlowStep label={allowsDebtDeduction ? "Deduct Personal Liabilities (Hanafi/Hanbali)" : "Exclude Liabilities (Shafi'i/Maliki)"} />
+            <FlowStep label={t(allowsDebtDeduction ? 'charts.flow_step2_yes' : 'charts.flow_step2_no', language)} />
             <div className="flex justify-center"><ChevronDown className="text-slate-800" size={24} /></div>
-            <FlowStep label="Validate Against Gold Nisab Threshold" highlight />
+            <FlowStep label={t('charts.flow_step3', language)} highlight />
             <div className="flex justify-center"><ChevronDown className="text-slate-800" size={24} /></div>
-            <FlowStep label="Commit 2.5% to Beneficiaries" success />
+            <FlowStep label={t('charts.flow_step4', language)} success />
           </div>
         </div>
       </div>
