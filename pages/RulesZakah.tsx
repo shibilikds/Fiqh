@@ -28,7 +28,7 @@ const RulesZakah: React.FC<Props> = ({ school, language }) => {
 
       <section className="bg-slate-900/40 backdrop-blur-xl rounded-3xl p-6 shadow-2xl border border-white/10">
         <h2 className="text-xl font-black text-slate-100 mb-6 flex items-center uppercase tracking-wide">
-          <CheckCircle2 className="text-emerald-400 mr-3" size={24} />
+          <CheckCircle2 className="text-emerald-400 me-3" size={24} />
           {t('rules.zakah_obligation_criteria', language)}
         </h2>
         <div className="space-y-5">
@@ -64,7 +64,7 @@ const RulesZakah: React.FC<Props> = ({ school, language }) => {
 
       <section className="bg-slate-900/40 backdrop-blur-xl rounded-3xl p-6 shadow-2xl border border-white/10">
         <h2 className="text-xl font-black text-slate-100 mb-6 flex items-center uppercase tracking-wide">
-          <Info className="text-blue-400 mr-3" size={24} />
+          <Info className="text-blue-400 me-3" size={24} />
           {t('rules.zakah_standard_rates', language)}
         </h2>
         <ul className="grid grid-cols-1 gap-3">
@@ -76,9 +76,9 @@ const RulesZakah: React.FC<Props> = ({ school, language }) => {
       </section>
 
       <div className="p-6 bg-slate-950/80 rounded-3xl border border-blue-400/20 shadow-2xl relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/5 rounded-full blur-2xl"></div>
+        <div className="absolute top-0 end-0 w-24 h-24 bg-blue-500/5 rounded-full blur-2xl"></div>
         <h4 className="text-[10px] font-black text-blue-300 uppercase tracking-widest mb-3 flex items-center">
-          <ShieldCheck className="mr-2" size={14} /> {t('rules.zakah_recipient_title', language)}
+          <ShieldCheck className="me-2" size={14} /> {t('rules.zakah_recipient_title', language)}
         </h4>
         <p className="text-xs text-slate-400 leading-relaxed font-medium">
           {t('rules.zakah_recipient_desc', language)}

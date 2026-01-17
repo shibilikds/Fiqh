@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Scale, ShieldCheck, Bookmark, AlertCircle, Info } from 'lucide-react';
+import { Scale, ShieldCheck, Bookmark, AlertCircle, Info, ListOrdered } from 'lucide-react';
 import { School, Language } from '../types';
 import { t } from '../services/translations';
 
@@ -20,7 +20,7 @@ const RulesInheritance: React.FC<Props> = ({ school, language }) => {
   const raddIsAppliedForThisCalculator = true;
 
   return (
-    <div className="space-y-6 max-w-2xl mx-auto px-1">
+    <div className="space-y-6 max-w-2xl mx-auto px-1 pb-10">
       <div className="text-center mb-10">
         <div className="inline-block p-5 bg-blue-500/10 rounded-3xl mb-5 border border-blue-400/20 shadow-2xl">
           <Scale className="text-blue-400" size={44} />
@@ -28,6 +28,27 @@ const RulesInheritance: React.FC<Props> = ({ school, language }) => {
         <h1 className="text-3xl font-black text-white tracking-tight uppercase">{t('rules.inheritance_page_title', language, { schoolName })}</h1>
         <p className="text-xs text-slate-400 font-bold tracking-widest mt-2 uppercase">{t('rules.inheritance_page_subtitle', language, { schoolName })}</p>
       </div>
+      
+      <section className="bg-slate-900/40 backdrop-blur-xl rounded-3xl p-6 shadow-2xl border border-white/10">
+        <div className="flex items-center space-x-3 mb-4">
+          <ListOrdered className="text-cyan-400" size={20} />
+          <h2 className="text-xl font-black text-slate-100 uppercase tracking-wide">{t('rules.dist_order_title', language)}</h2>
+        </div>
+        <div className="space-y-4">
+            <div className="p-4 bg-white/5 rounded-2xl border border-white/5">
+              <h4 className="text-xs font-black text-cyan-300 uppercase mb-1">{t('rules.dist_order_step1_title', language)}</h4>
+              <p className="text-[11px] text-slate-400 leading-relaxed font-medium">{t('rules.dist_order_step1_desc', language)}</p>
+            </div>
+            <div className="p-4 bg-white/5 rounded-2xl border border-white/5">
+              <h4 className="text-xs font-black text-cyan-300 uppercase mb-1">{t('rules.dist_order_step2_title', language)}</h4>
+              <p className="text-[11px] text-slate-400 leading-relaxed font-medium">{t('rules.dist_order_step2_desc', language)}</p>
+            </div>
+            <div className="p-4 bg-white/5 rounded-2xl border border-white/5">
+              <h4 className="text-xs font-black text-cyan-300 uppercase mb-1">{t('rules.dist_order_step3_title', language)}</h4>
+              <p className="text-[11px] text-slate-400 leading-relaxed font-medium">{t('rules.dist_order_step3_desc', language)}</p>
+            </div>
+        </div>
+      </section>
 
       <section className="bg-slate-900/40 backdrop-blur-xl rounded-3xl p-6 shadow-2xl border border-white/10">
         <div className="flex items-center space-x-3 mb-4">
@@ -69,9 +90,9 @@ const RulesInheritance: React.FC<Props> = ({ school, language }) => {
       </section>
 
       <div className="p-6 bg-gradient-to-br from-blue-700/20 to-indigo-900/20 rounded-[2rem] border border-blue-400/20 shadow-xl relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-blue-400/5 rounded-full blur-3xl"></div>
+        <div className="absolute top-0 end-0 w-32 h-32 bg-blue-400/5 rounded-full blur-3xl"></div>
         <h3 className="font-black flex items-center mb-4 text-xs uppercase tracking-widest text-blue-300 relative z-10">
-          <Bookmark className="mr-3" size={16} />
+          <Bookmark className="me-3" size={16} />
           {t('rules.educational_summary_title', language)}
         </h3>
         <p className="text-xs text-slate-300 leading-relaxed font-medium relative z-10 italic">

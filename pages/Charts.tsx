@@ -38,7 +38,7 @@ const Charts: React.FC<ChartsProps> = ({ school, language }) => {
         <div className="bg-slate-900/40 backdrop-blur-xl p-8 lg:p-12 rounded-[2.5rem] shadow-2xl border border-white/10 relative overflow-hidden flex flex-col">
           <div className="absolute -top-10 -left-10 w-48 h-48 bg-blue-500/5 rounded-full blur-3xl"></div>
           <h3 className="text-sm font-black text-slate-300 mb-10 flex items-center uppercase tracking-[0.2em] relative z-10">
-            <Layers className="mr-4 text-blue-400" size={20} />
+            <Layers className="me-4 text-blue-400" size={20} />
             {t('charts.dist_title', language)}
           </h3>
           <div className="h-[350px] w-full relative z-10">
@@ -88,7 +88,7 @@ const Charts: React.FC<ChartsProps> = ({ school, language }) => {
 
         <div className="bg-slate-900/40 backdrop-blur-xl p-8 lg:p-12 rounded-[2.5rem] shadow-2xl border border-white/10 flex flex-col">
           <h3 className="text-sm font-black text-slate-300 mb-10 flex items-center uppercase tracking-[0.2em]">
-            <GitGraph className="mr-4 text-indigo-400" size={20} />
+            <GitGraph className="me-4 text-indigo-400" size={20} />
             {t('charts.zakah_logic_title', language)}
           </h3>
           <div className="flex-grow flex flex-col justify-center space-y-6 lg:space-y-8">

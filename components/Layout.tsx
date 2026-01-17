@@ -38,7 +38,7 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPage, setPage, current
   return (
     <div className="min-h-screen text-slate-100 flex flex-col lg:flex-row relative z-0">
       
-      <aside className="hidden lg:flex flex-col w-64 bg-slate-950/50 backdrop-blur-xl border-r border-white/5 sticky top-0 h-screen p-6 shrink-0 z-10">
+      <aside className="hidden lg:flex flex-col w-64 bg-slate-950/50 backdrop-blur-xl border-e border-white/5 sticky top-0 h-screen p-6 shrink-0 z-10">
         <div className="mb-8 px-2">
           <h1 className="text-2xl font-black tracking-tighter bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
             {t('app.title', currentLanguage)}
@@ -79,7 +79,7 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPage, setPage, current
 
         <div className="mt-auto p-4 bg-blue-500/5 rounded-2xl border border-blue-400/10">
           <div className="flex items-center text-blue-300 text-[10px] font-black uppercase tracking-widest mb-2">
-            <Scale size={14} className="mr-2" /> {t('layout.academic_mode', currentLanguage)}
+            <Scale size={14} className="me-2" /> {t('layout.academic_mode', currentLanguage)}
           </div>
           <p className="text-[9px] text-slate-500 font-bold leading-relaxed">
             {t('layout.madhhab_engine_note', currentLanguage)}
@@ -94,7 +94,7 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPage, setPage, current
             <button className="p-2.5 rounded-lg bg-indigo-500/10 border border-indigo-400/30">
               <Languages size={16} className="text-indigo-300" />
             </button>
-            <div className="absolute right-0 mt-2 w-32 bg-slate-900 border border-white/10 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-[60]">
+            <div className="absolute end-0 mt-2 w-32 bg-slate-900 border border-white/10 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-[60]">
                {languages.map(s => (
                 <button key={s.id} onClick={() => setLanguage(s.id)} className={`w-full text-center px-4 py-2 text-xs font-black uppercase tracking-tighter hover:bg-indigo-600 hover:text-white first:rounded-t-xl last:rounded-b-xl border-b border-white/5 last:border-0 ${currentLanguage === s.id ? 'text-indigo-300' : 'text-slate-300'}`}>
                   {s.label}
@@ -105,7 +105,7 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPage, setPage, current
         </header>
 
         <main className="w-full max-w-4xl lg:max-w-5xl px-4 py-6 lg:py-12 flex-grow overflow-x-hidden">
-          <div className="mb-8 lg:mb-12 bg-blue-900/30 border-l-4 border-blue-400/50 p-4 lg:p-6 text-sm text-blue-100 rounded-r backdrop-blur-sm shadow-xl flex items-center justify-between">
+          <div className="mb-8 lg:mb-12 bg-blue-900/30 border-s-4 border-blue-400/50 p-4 lg:p-6 text-sm text-blue-100 rounded-e backdrop-blur-sm shadow-xl flex items-center justify-between">
             <div>
               <strong className="text-blue-300">{t('layout.note', currentLanguage)}:</strong> {t('layout.school_notice', currentLanguage, { schoolName: getSchoolLabel(currentSchool) })}
             </div>

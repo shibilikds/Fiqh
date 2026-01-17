@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Calculator, Banknote, BookText, FileText, PieChart, Info, Scale } from 'lucide-react';
+import { Calculator, Banknote, BookText, FileText, PieChart, Info, Scale, AlertTriangle } from 'lucide-react';
 import { Page, School, Language } from '../types';
 import GoldPriceBox from '../GoldPriceBox';
 import { t } from '../services/translations';
@@ -72,6 +72,15 @@ const Home: React.FC<HomeProps> = ({ setPage, school, language }) => {
           </span>
         </div>
       </section>
+
+      <div className="bg-amber-600/10 rounded-3xl p-6 border border-amber-400/20 shadow-xl max-w-2xl mx-auto w-full">
+        <h3 className="text-xs font-black text-amber-300 mb-4 flex items-center uppercase tracking-widest">
+            <AlertTriangle className="me-3" size={16} /> {t('about.disclaimer_title', language)}
+        </h3>
+        <p className="text-xs text-amber-200 leading-relaxed font-medium">
+            {t('about.disclaimer_content', language)}
+        </p>
+      </div>
 
       <div className="max-w-2xl mx-auto w-full">
         <GoldPriceBox language={language} />

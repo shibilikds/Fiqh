@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { HeirInput, Page, CalculationResult, School, Language } from '../types';
 import { calculateInheritance } from '../services/inheritanceEngine';
-import { ArrowLeft, User, Plus, Minus, Calculator, Users, HelpCircle, Ghost, TrendingUp, TrendingDown } from 'lucide-react';
+import { ArrowLeft, User, Plus, Minus, Calculator, Users, HelpCircle, Ghost, TrendingUp, TrendingDown, Info } from 'lucide-react';
 import { t } from '../services/translations';
 
 interface Props {
@@ -11,6 +11,9 @@ interface Props {
   school: School;
   language: Language;
 }
+
+type DistributionType = 'value' | 'area';
+type AreaUnit = 'cent' | 'sqft' | 'acre';
 
 const HEIR_CONFIG = [
     { categoryKey: 'heir.category_primary', heirs: ['husband', 'wife', 'sons', 'daughters', 'father', 'mother'] },
@@ -54,7 +57,11 @@ const HEIR_META: { [key: string]: { labelKey: string, max?: number, disabledBy?:
 const InheritanceCalc: React.FC<Props> = ({ mode, setPage, school, language }) => {
   const [inputs, setInputs] = useState<HeirInput>({});
   const [totalAmount, setTotalAmount] = useState<number>(0);
+  const [totalArea, setTotalArea] = useState<number>(0);
+  const [distributionType, setDistributionType] = useState<DistributionType>('value');
+  const [areaUnit, setAreaUnit] = useState<AreaUnit>('cent');
   const [results, setResults] = useState<CalculationResult | null>(null);
+  const [totalAreaInCents, setTotalAreaInCents] = useState<number>(0);
 
   const schoolName = t(`school.${school}`, language);
 
@@ -70,30 +77,55 @@ const InheritanceCalc: React.FC<Props> = ({ mode, setPage, school, language }) =
   };
 
   const handleCalculate = () => {
-    const res = calculateInheritance(inputs, mode === 'amount' ? totalAmount : undefined, school, language);
+    let valueForEngine: number;
+
+    if (distributionType === 'value') {
+      valueForEngine = totalAmount;
+    } else {
+      let convertedArea: number;
+      if (areaUnit === 'acre') {
+        convertedArea = totalArea * 100;
+      } else if (areaUnit === 'sqft') {
+        convertedArea = totalArea / 435.6;
+      } else {
+        convertedArea = totalArea;
+      }
+      valueForEngine = convertedArea;
+      setTotalAreaInCents(convertedArea);
+    }
+
+    const res = calculateInheritance(inputs, valueForEngine > 0 ? valueForEngine : undefined, school, language);
     setResults(res);
   };
 
   if (results) {
+    const totalValue = distributionType === 'value' ? totalAmount : totalAreaInCents;
     return (
       <div className="space-y-6 lg:space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-16">
         <button onClick={() => setResults(null)} className="flex items-center text-blue-400 text-sm font-black uppercase tracking-[0.2em] hover:text-blue-300 transition-colors">
-          <ArrowLeft size={16} className="mr-2" /> {t('calc.adjust_heirs', language)}
+          <ArrowLeft size={16} className="me-2" /> {t('calc.adjust_heirs', language)}
         </button>
 
         <div className="bg-slate-900/60 backdrop-blur-xl rounded-[2.5rem] p-6 lg:p-10 shadow-2xl border border-white/10">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-10 gap-4">
             <div>
               <h2 className="text-2xl font-black text-white tracking-tight flex items-center">
-                <Calculator className="mr-4 text-blue-400" size={32} />
+                <Calculator className="me-4 text-blue-400" size={32} />
                 {t('calc.distribution_report', language)}
               </h2>
               <p className="text-[10px] text-blue-400 font-black uppercase tracking-[0.2em] mt-1">{t('calc.school', language)}: {schoolName}</p>
             </div>
             {mode === 'amount' && (
               <div className="text-left sm:text-right">
-                <span className="block text-[10px] text-slate-500 font-black uppercase tracking-widest mb-1">{t('calc.total_estate', language)}</span>
-                <span className="text-xl font-black text-blue-400">₹{totalAmount.toLocaleString()}</span>
+                <span className="block text-[10px] text-slate-500 font-black uppercase tracking-widest mb-1">
+                  {distributionType === 'value' ? t('calc.total_estate', language) : t('calc.total_estate_area', language)}
+                </span>
+                <span className="text-xl font-black text-blue-400">
+                  {distributionType === 'value' 
+                    ? `₹${totalValue.toLocaleString()}`
+                    : `${totalValue.toLocaleString(undefined, { maximumFractionDigits: 2 })} ${t('calc.unit_cent', language)}`
+                  }
+                </span>
               </div>
             )}
           </div>
@@ -120,8 +152,20 @@ const InheritanceCalc: React.FC<Props> = ({ mode, setPage, school, language }) =
                 </div>
                 {mode === 'amount' && res.amount !== undefined && (
                     <div className="mt-4 flex flex-wrap gap-2">
-                        <div className="bg-blue-600/20 border border-blue-400/30 px-3 py-1.5 rounded-xl text-xs font-black text-blue-300">{t('calc.total', language)}: ₹{res.amount.toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
-                        {res.count > 1 && <div className="bg-indigo-600/20 border border-indigo-400/30 px-3 py-1.5 rounded-xl text-xs font-black text-indigo-300">{t('calc.each', language)}: ₹{(res.amount / res.count).toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>}
+                        <div className="bg-blue-600/20 border border-blue-400/30 px-3 py-1.5 rounded-xl text-xs font-black text-blue-300">
+                          {t('calc.total', language)}: {
+                            distributionType === 'value' 
+                              ? `₹${res.amount.toLocaleString(undefined, { maximumFractionDigits: 0 })}`
+                              : `${res.amount.toLocaleString(undefined, { maximumFractionDigits: 2 })} ${t('calc.unit_cent', language)}`
+                          }
+                        </div>
+                        {res.count > 1 && <div className="bg-indigo-600/20 border border-indigo-400/30 px-3 py-1.5 rounded-xl text-xs font-black text-indigo-300">
+                          {t('calc.each', language)}: {
+                            distributionType === 'value' 
+                              ? `₹${(res.amount / res.count).toLocaleString(undefined, { maximumFractionDigits: 0 })}`
+                              : `${(res.amount / res.count).toLocaleString(undefined, { maximumFractionDigits: 2 })} ${t('calc.unit_cent', language)}`
+                          }
+                        </div>}
                     </div>
                 )}
               </div>
@@ -157,15 +201,48 @@ const InheritanceCalc: React.FC<Props> = ({ mode, setPage, school, language }) =
 
       <div className="bg-slate-900/50 backdrop-blur-xl rounded-[2.5rem] p-6 lg:p-10 shadow-2xl border border-white/10 space-y-8 lg:space-y-12">
         {mode === 'amount' && (
-          <div className="max-w-md mx-auto space-y-3">
-            <label className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] ml-2">{t('calc.total_net_estate', language)}</label>
-            <input type="number" placeholder="0" className="w-full p-6 bg-slate-950 border border-white/10 rounded-3xl focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all text-white font-black text-2xl" value={totalAmount || ''} onChange={(e) => setTotalAmount(Number(e.target.value))} />
+          <div className="max-w-md mx-auto space-y-6">
+            <div>
+              <label className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] ms-2 mb-2 block">{t('calc.select_distribution_method', language)}</label>
+              <div className="grid grid-cols-2 gap-2 p-1 bg-slate-950 rounded-2xl border border-white/10">
+                <button onClick={() => setDistributionType('value')} className={`px-4 py-3 rounded-xl text-xs font-black transition-all ${distributionType === 'value' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:bg-white/5'}`}>
+                  {t('calc.dist_by_value', language)}
+                </button>
+                <button onClick={() => setDistributionType('area')} className={`px-4 py-3 rounded-xl text-xs font-black transition-all ${distributionType === 'area' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:bg-white/5'}`}>
+                  {t('calc.dist_by_area', language)}
+                </button>
+              </div>
+            </div>
+            {distributionType === 'value' ? (
+              <div className="space-y-3">
+                <label className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] ms-2">{t('calc.total_net_estate', language)}</label>
+                <div className="p-4 bg-amber-600/10 rounded-2xl border border-amber-400/20 text-xs text-amber-200 flex items-start gap-3">
+                  <Info size={16} className="shrink-0 mt-0.5"/>
+                  <span>{t('calc.net_estate_note', language)}</span>
+                </div>
+                <input type="number" placeholder="0" className="w-full p-6 bg-slate-950 border border-white/10 rounded-3xl focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all text-white font-black text-2xl" value={totalAmount || ''} onChange={(e) => setTotalAmount(Number(e.target.value))} />
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <label className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] ms-2">{t('calc.total_area', language)}</label>
+                <input type="number" placeholder="0" className="w-full p-6 bg-slate-950 border border-white/10 rounded-3xl focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all text-white font-black text-2xl" value={totalArea || ''} onChange={(e) => setTotalArea(Number(e.target.value))} />
+                <div className="grid grid-cols-3 gap-2 p-1 bg-slate-950 rounded-2xl border border-white/10">
+                  <button onClick={() => setAreaUnit('cent')} className={`px-4 py-3 rounded-xl text-xs font-black transition-all ${areaUnit === 'cent' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-white/5'}`}>{t('calc.unit_cent', language)}</button>
+                  <button onClick={() => setAreaUnit('sqft')} className={`px-4 py-3 rounded-xl text-xs font-black transition-all ${areaUnit === 'sqft' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-white/5'}`}>{t('calc.unit_sqft', language)}</button>
+                  <button onClick={() => setAreaUnit('acre')} className={`px-4 py-3 rounded-xl text-xs font-black transition-all ${areaUnit === 'acre' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-white/5'}`}>{t('calc.unit_acre', language)}</button>
+                </div>
+                <div className="p-4 bg-indigo-600/10 rounded-2xl border border-indigo-400/20 text-xs text-indigo-200 flex items-start gap-3">
+                  <Info size={16} className="shrink-0 mt-0.5"/>
+                  <span>{t('calc.area_conversion_note', language)}</span>
+                </div>
+              </div>
+            )}
           </div>
         )}
         
         {HEIR_CONFIG.map(cat => (
             <div key={cat.categoryKey}>
-                <h3 className="text-xs font-black text-blue-400 uppercase tracking-[0.3em] mb-4 ml-2">{t(cat.categoryKey, language)}</h3>
+                <h3 className="text-xs font-black text-blue-400 uppercase tracking-[0.3em] mb-4 ms-2">{t(cat.categoryKey, language)}</h3>
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                     {cat.heirs.map(id => {
                         const meta = HEIR_META[id];

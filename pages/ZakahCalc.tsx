@@ -60,8 +60,8 @@ const ZakahCalc: React.FC<Props> = ({ setPage, school, language }) => {
           <InputGroup label={t('zakah.trade_label', language)} value={inputs.businessAssets} onChange={(v) => setInputs({...inputs, businessAssets: v})} />
           
           <div className={`pt-2 transition-all ${!allowsDebtDeduction ? 'opacity-30 grayscale' : ''}`}>
-            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 flex items-center">
-              {t('zakah.debt_label', language)} {!allowsDebtDeduction && <AlertTriangle size={12} className="ml-2" />}
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ms-1 flex items-center">
+              {t('zakah.debt_label', language)} {!allowsDebtDeduction && <AlertTriangle size={12} className="ms-2" />}
             </label>
             <input 
               type="number" 
@@ -100,7 +100,7 @@ const ZakahCalc: React.FC<Props> = ({ setPage, school, language }) => {
 
 const InputGroup = ({ label, value, onChange }: { label: string, value: number, onChange: (v: number) => void }) => (
   <div className="space-y-2">
-    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{label}</label>
+    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ms-1">{label}</label>
     <input type="number" className="w-full p-4 bg-slate-950 border border-white/10 rounded-2xl font-bold text-white text-lg" value={value || ''} onChange={(e) => onChange(Number(e.target.value))} />
   </div>
 );

@@ -21,7 +21,7 @@ const translations = {
   "nav.about": { en: "About", ml: "വിവരം", ar: "حول" },
   "layout.note": { en: "Note", ml: "ശ്രദ്ധിക്കുക", ar: "ملاحظة" },
   "layout.school_notice": { en: "Calculations currently follow the {schoolName} School.", ml: "കണക്കുകൂട്ടലുകൾ ഇപ്പോൾ {schoolName} മദ്ഹബ് അടിസ്ഥാനമാക്കിയാണ്.", ar: "الحسابات تتبع حاليًا المذهب {schoolName}." },
-  "layout.academic_mode": { en: "Academic Mode", ml: "അക്കാദമിക് മോഡ്", ar: "الوضع الأكاديمي" },
+  "layout.academic_mode": { en: "Academic Mode", ml: "അക്കാദമിക് മോഡ്", ar: "الوضع الأكاديميمي" },
   "layout.madhhab_engine_note": { en: "Multi-Madhhab engine active. Rules change based on selection.", ml: "മൾട്ടി-മദ്ഹബ് എഞ്ചിൻ സജീവം. തിരഞ്ഞെടുപ്പ് അനുസരിച്ച് നിയമങ്ങൾ മാറും.", ar: "محرك المذاهب المتعددة نشط. تتغير القواعد بناءً على الاختيار." },
   "lang.switcher_label": { en: "Language", ml: "ഭാഷ", ar: "اللغة" },
   
@@ -41,7 +41,7 @@ const translations = {
   "home.card_visual_insights": { en: "Visual Insights", ml: "ചാർട്ടുകൾ", ar: "رؤى بصرية" },
   "home.card_visual_insights_label": { en: "Charts & Flow", ml: "ചാർട്ടുകളും ഫ്ലോകളും", ar: "الرسوم والتدفق" },
   "home.comprehensive_jurisprudence": { en: "Comprehensive Jurisprudence", ml: "സമഗ്രമായ കർമ്മശാസ്ത്രം", ar: "فقه شامل" },
-  "home.platform_description": { en: "Our platform dynamically adjusts calculations to match the specific rules of the four major Sunni schools. From the {schoolName} perspective on wealth thresholds to the intricate inheritance laws of blood relatives, experience precise legal technology designed for the modern world.", ml: "നാല് പ്രധാന സുന്നി മദ്ഹബുകളുടെ നിയമങ്ങൾക്ക് അനുസരിച്ച് ഞങ്ങളുടെ പ്ലാറ്റ്ഫോം കണക്കുകൂട്ടലുകൾ ക്രമീകരിക്കുന്നു. {schoolName} മദ്ഹബ് പ്രകാരമുള്ള ധനത്തിന്റെ പരിധി മുതൽ അടുത്ത ബന്ധുക്കളുടെ അനന്തരാവകാശ നിയമങ്ങൾ വരെ, ആധുനിക ലോകത്തിനായി രൂപകൽപ്പന ചെയ്ത കൃത്യമായ നിയമ സാങ്കേതികവിദ്യ അനുഭവിക്കുക.", ar: "تقوم منصتنا بتعديل الحسابات ديناميكيًا لتتناسب مع القواعد المحددة للمذاهب السنية الأربعة الرئيسية. من منظور المذهب {schoolName} حول عتبات الثروة إلى قوانين الميراث المعقدة للأقارب، جرب التكنولوجيا القانونية الدقيقة المصممة للعالم الحديث." },
+  "home.platform_description": { en: "Our platform dynamically adjusts calculations to match the specific rules of the four major Sunni schools. From the {schoolName} perspective on wealth thresholds to the intricate inheritance laws of blood relatives, experience precise legal technology designed for the modern world.", ml: "നാല് പ്രധാന സുന്നി മദ്ഹബുകളുടെ നിയമങ്ങൾക്ക് അനുസരിച്ച് ഞങ്ങളുടെ പ്ലാറ്റ്ഫോം കണക്കുകൂട്ടലുകൾ ക്രമീകരിക്കുന്നു. {schoolName} മദ്ഹബ് പ്രകാരമുള്ള ധനത്തിന്റെ പരിധി മുതൽ അടുത്ത ബന്ധുക്കളുടെ അനന്തരാവകാശ നിയമങ്ങൾ വരെ, ആധുനിക് ലോകത്തിനായി രൂപകൽപ്പന ചെയ്ത കൃത്യമായ നിയമ സാങ്കതികവിദ്യ അനുഭവിക്കുക.", ar: "تقوم منصتنا بتعديل الحسابات ديناميكيًا لتتناسب مع القواعد المحددة للمذاهب السنية الأربعة الرئيسية. من منظور المذهب {schoolName} حول عتبات الثروة إلى قوانين الميراث المعقدة للأقارب، جرب التكنولوجيا القانونية الدقيقة المصممة للعالم الحديث." },
   
   // Gold Price Box
   "gold.price_title": { en: "Gold Price (24K)", ml: "സ്വർണ്ണ വില (24K)", ar: "سعر الذهب (24 قيراط)" },
@@ -107,12 +107,22 @@ const translations = {
   "heir.category_wala": { en: "Emancipators (Wala')", ml: "വലാഅ്", ar: "الولاء" },
   "calc.financial_estate": { en: "Financial Estate", ml: "സാമ്പത്തിക ഓഹരി", ar: "التركة المالية" },
   "calc.fractional_shares": { en: "Fractional Shares", ml: "ഫ്രാക്ഷണൽ ഓഹരികൾ", ar: "الحصص الكسرية" },
+  "calc.select_distribution_method": { en: "Select Distribution Method", ml: "വിഭജിക്കൽ രീതി തിരഞ്ഞെടുക്കുക", ar: "اختر طريقة التوزيع" },
+  "calc.dist_by_value": { en: "By Value (₹)", ml: "മൂല്യം (₹) അടിസ്ഥാനമാക്കി", ar: "حسب القيمة (₹)" },
+  "calc.dist_by_area": { en: "By Land / Area", ml: "സ്ഥലം / വിസ്തീർണം അടിസ്ഥാനമാക്കി", ar: "حسب الأرض / المساحة" },
+  "calc.total_area": { en: "Total Area", ml: "ആകെ വിസ്തീർണം", ar: "المساحة الإجمالية" },
+  "calc.unit_cent": { en: "Cent", ml: "സെന്റ്", ar: "سنت" },
+  "calc.unit_sqft": { en: "Sq.ft", ml: "ചതുരശ്ര അടി", ar: "قدم مربع" },
+  "calc.unit_acre": { en: "Acre", ml: "ഏക്കർ", ar: "فدان" },
   "calc.total_net_estate": { en: "Total Net Estate (INR)", ml: "മൊത്തം സ്വത്ത് (INR)", ar: "إجمالي صافي التركة (INR)" },
+  "calc.net_estate_note": { en: "Enter value AFTER settling debts & bequests.", ml: "കടങ്ങളും വസ്വിയ്യത്തും കഴിച്ചുള്ള ബാക്കി തുക രേഖപ്പെടുത്തുക.", ar: "أدخل القيمة بعد تسوية الديون والوصايا." },
+  "calc.area_conversion_note": { en: "Note: All area inputs will be converted to Cents for calculation and display.", ml: "ശ്രദ്ധിക്കുക: നിങ്ങൾ നൽകുന്ന വിസ്തീർണ്ണം കണക്കുകൂട്ടലുകൾക്കും പ്രദർശനത്തിനും വേണ്ടി സെന്റിലേക്ക് മാറ്റുന്നതാണ്.", ar: "ملاحظة: سيتم تحويل جميع إدخالات المساحة إلى سنت للحساب والعرض." },
   "calc.calculate_distribution": { en: "Calculate Distribution", ml: "ഓഹരി കണക്കാക്കുക", ar: "احسب التوزيع" },
   "calc.adjust_heirs": { en: "Adjust Heirs", ml: "അവകാശികളെ ക്രമീകരിക്കുക", ar: "تعديل الورثة" },
   "calc.distribution_report": { en: "Distribution Report", ml: "വിതരണ റിപ്പോർട്ട്", ar: "تقرير التوزيع" },
   "calc.school": { en: "School", ml: "മദ്ഹബ്", ar: "المذهب" },
   "calc.total_estate": { en: "Total Estate", ml: "മൊത്തം സ്വത്ത്", ar: "إجمالي التركة" },
+  "calc.total_estate_area": { en: "Total Area (Cent)", ml: "ആകെ വിസ്തീർണം (സെന്റ്)", ar: "إجمالي المساحة (سنت)" },
   "calc.awl_title": { en: "Al-Awl (Increase)", ml: "അൽ-ഔല് (വർദ്ധനവ്)", ar: "العول (زيادة)" },
   "calc.awl_desc": { en: "Shares exceeded estate. Base increased from {asl} to {finalAsl}.", ml: "ഓഹരികൾ സ്വത്തിനെ കവിഞ്ഞു. അടിസ്ഥാനം {asl} ൽ നിന്ന് {finalAsl} ആയി വർദ്ധിച്ചു.", ar: "السهام تجاوزت التركة. زاد الأصل من {asl} إلى {finalAsl}." },
   "calc.radd_title": { en: "Al-Radd (Return)", ml: "അർ-റദ്ദ് (മടക്കം)", ar: "الرد (عودة)" },
@@ -158,6 +168,13 @@ const translations = {
   // Rules Pages
   "rules.inheritance_page_title": { en: "{schoolName} INHERITANCE", ml: "{schoolName} അനന്തരാവകാശം", ar: "ميراث المذهب {schoolName}" },
   "rules.inheritance_page_subtitle": { en: "Principles of {schoolName} Jurisprudence", ml: "{schoolName} കർമ്മശാസ്ത്രത്തിന്റെ തത്വങ്ങൾ", ar: "أصول فقه المذهب {schoolName}" },
+  "rules.dist_order_title": { en: "Order of Distribution", ml: "സ്വത്ത് വിതരണ ക്രമം", ar: "ترتيب التوزيع" },
+  "rules.dist_order_step1_title": { en: "1. Debts (Duyun)", ml: "1. കടങ്ങൾ (ദുയൂൻ)", ar: "١. الديون" },
+  "rules.dist_order_step1_desc": { en: "All outstanding financial debts, including religious obligations (e.g., unpaid Zakah), must be settled first from the total estate.", ml: "മരണപ്പെട്ട വ്യക്തിയുടെ കടങ്ങളും, നൽകി വീട്ടാനുള്ള സക്കാത്ത് പോലുള്ള മതപരമായ കടമകളും മൊത്തം സ്വത്തിൽ നിന്ന് ആദ്യം വീട്ടേണ്ടതാണ്.", ar: "يجب تسوية جميع الديون المالية المستحقة، بما في ذلك الالتزامات الدينية (مثل الزكاة غير المدفوعة)، أولاً من إجمالي التركة." },
+  "rules.dist_order_step2_title": { en: "2. Bequest (Wasiyyah)", ml: "2. വസിയ്യത്ത്", ar: "٢. الوصية" },
+  "rules.dist_order_step2_desc": { en: "After settling debts, any valid bequests or wills may be executed, up to a maximum of one-third (1/3) of the remaining estate.", ml: "കടങ്ങൾ വീട്ടിയതിന് ശേഷം, ബാക്കിയുള്ള സ്വത്തിന്റെ മൂന്നിലൊന്നിൽ (1/3) കൂടാത്ത വസിയ്യത്ത് നടപ്പിലാക്കാവുന്നതാണ്.", ar: "بعد تسوية الديون، يمكن تنفيذ أي وصايا شرعية، بحد أقصى ثلث (1/3) المتبقي من التركة." },
+  "rules.dist_order_step3_title": { en: "3. Heirs (Warithun)", ml: "3. അവകാശികൾ (വാരിഥൂൻ)", ar: "٣. الورثة" },
+  "rules.dist_order_step3_desc": { en: "The final remaining amount is distributed amongst the legal heirs according to the fixed shares outlined in the Qur'an and Sunnah.", ml: "അവസാനം ശേഷിക്കുന്ന സ്വത്ത്, ഖുർആനിലും സുന്നത്തിലും വ്യക്തമാക്കിയ ഓഹരികൾ പ്രകാരം നിയമപരമായ അവകാശികൾക്കിടയിൽ വിതരണം ചെയ്യപ്പെടുന്നു.", ar: "يتم توزيع المبلغ المتبقي النهائي بين الورثة الشرعيين وفقًا للأنصبة المحددة في القرآن والسنة." },
   "rules.zakah_page_title": { en: "{schoolName} ZAKAH", ml: "{schoolName} സകാത്ത്", ar: "زكاة المذهب {schoolName}" },
   "rules.zakah_page_subtitle": { en: "Principles of {schoolName} Wealth Tax", ml: "{schoolName} സമ്പത്തിന്റെ നികുതി തത്വങ്ങൾ", ar: "أصول ضريبة الثروة في مذهب {schoolName}" },
   "rules.radd_title": { en: "Al-Radd (The Return)", ml: "അർ-റദ്ദ് (മടക്കം)", ar: "الرد" },
@@ -212,8 +229,8 @@ const translations = {
 
   // About Page
   "about.title": { en: "About the Hub", ml: "ഹബ്ബിനെക്കുറിച്ച്", ar: "حول المركز" },
-  "about.shafi_intro": { en: "Founded by Imam Muhammad ibn Idris al-Shafi'i, the Shafi'i Madhhab is celebrated for its precise legal reasoning and textual fidelity.", ml: "ഇമാം മുഹമ്മദ് ഇബ്നു ഇദ്‌രീസ് അൽ-ഷാഫി സ്ഥാപിച്ച ഷാഫി മദ്ഹബ്, അതിന്റെ കൃത്യമായ നിയമപരമായ ന്യായവാദങ്ങൾക്കും പ്രമാണങ്ങളോടുള്ള വിശ്വസ്തതയ്ക്കും പേരുകേട്ടതാണ്.", ar: "أسسه الإمام محمد بن إدريس الشافعي، ويشتهر المذهب الشافعي باستدلاله القانوني الدقيق وأمانته النصية." },
-  "about.hub_purpose": { en: "This hub serves as a modern digital companion for students of the school, providing mathematically accurate calculations and rule summaries based on authoritative Shafi'i manuals.", ml: "ഈ ഹബ്, ഈ മദ്ഹബിലെ വിദ്യാർത്ഥികൾക്ക് ഒരു ആധുനിക ഡിജിറ്റൽ സഹായിയായി വർത്തിക്കുന്നു, ആധികാരിക ഷാഫി ഗ്രന്ഥങ്ങളെ അടിസ്ഥാനമാക്കി ഗണിതശാസ്ത്രപരമായി കൃത്യമായ കണക്കുകൂട്ടലുകളും നിയമ സംഗ്രഹങ്ങളും നൽകുന്നു.", ar: "يعمل هذا المركز كرفيق رقمي حديث لطلاب المذهب، حيث يوفر حسابات دقيقة رياضيًا وملخصات للقواعد بناءً على كتب الشافعية المعتمدة." },
+  "about.shafi_intro": { en: "Founded by Imam Muhammad ibn Idris al-Shafi'i, the Shafi'i Madhhab is celebrated for its precise legal reasoning and textual fidelity.", ml: "ഇമാം മുഹമ്മദ് ഇബ്നു ഇദ്‌രീസ് അൽ-ഷാഫി സ്ഥാപിച്ച ഷാഫി മദ്ഹബ്, അതിന്റെ കൃത്യമായ നിയമപരമായ ന്യായവാദങ്ങൾക്കും പ്രമാണങ്ങളോടുള്ള വിശ്വസ്തതയ്ക്കും പേരുകേട്ടതാണ്.", ar: "أسسه الإمام محمد بن إ Idris الشافعي، ويشتهر المذهب الشافعي باستدلاله القانوني الدقيق وأمانته النصية." },
+  "about.hub_purpose": { en: "This hub serves as a modern digital companion for students of the school, providing mathematically accurate calculations and rule summaries based on authoritative Shafi'i manuals.", ml: "ഈ ഹബ്, ഈ മദ്ഹബിലെ വിദ്യാർത്ഥികൾക്ക് ഒരു ആധുനിക് ഡിജിറ്റൽ സഹായിയായി വർത്തിക്കുന്നു, ആധികാരിക ഷാഫി ഗ്രന്ഥങ്ങളെ അടിസ്ഥാനമാക്കി ഗണിതശാസ്ത്രപരമായി കൃത്യമായ കണക്കുകൂട്ടലുകളും നിയമ സംഗ്രഹങ്ങളും നൽകുന്നു.", ar: "يعمل هذا المركز كرفيق رقمي حديث لطلاب المذهب، حيث يوفر حسابات دقيقة رياضيًا وملخصات للقواعد بناءً على كتب الشافعية المعتمدة." },
   "about.tech_specs": { en: "Technical Specs", ml: "സാങ്കേതിക വിവരങ്ങൾ", ar: "المواصفات الفنية" },
   "about.engine_title": { en: "Engine Architecture", ml: "എഞ്ചിൻ ആർക്കിടെക്ചർ", ar: "هندسة المحرك" },
   "about.engine_desc": { en: "Logic centralized in {file}. Built with modular Shafi'i rulesets for future expansion.", ml: "{file} എന്നതിൽ ലോജിക് കേന്ദ്രീകരിച്ചിരിക്കുന്നു. ഭാവിയിലെ വിപുലീകരണത്തിനായി മോഡുലാർ ഷാഫി നിയമങ്ങൾ ഉപയോഗിച്ച് നിർമ്മിച്ചത്.", ar: "تتركز المنطق في {file}. بنيت مع مجموعات قواعد شافعية نمطية للتوسع المستقبلي." },
@@ -222,7 +239,8 @@ const translations = {
   "about.contact_title": { en: "Contact & Support", ml: "ബന്ധപ്പെടാനും പിന്തുണയ്ക്കും", ar: "الاتصال والدعم" },
   "about.contact_desc": { en: "For academic clarifications or to report calculation edge-cases, please connect with our editorial team.", ml: "അക്കാദമിക് വ്യക്തതകൾക്കോ ​​കണക്കുകൂട്ടലുകളിലെ പിഴവുകൾ റിപ്പോർട്ട് ചെയ്യുന്നതിനോ, ദയവായി ഞങ്ങളുടെ എഡിറ്റോറിയൽ ടീമുമായി ബന്ധപ്പെടുക.", ar: "للاستيضاحات الأكاديمية أو للإبلاغ عن حالات حسابية نادرة، يرجى التواصل مع فريق التحرير لدينا." },
   "about.version": { en: "v1.2.0 • Madhhab Series", ml: "v1.2.0 • മദ്ഹബ് സീരീസ്", ar: "v1.2.0 • سلسلة المذاهب" },
-  "about.disclaimer": { en: "Academic Research Only.", ml: "അക്കാദമിക് ഗവേഷണത്തിന് മാത്രം.", ar: "للبحث الأكاديمي فقط." },
+  "about.disclaimer_title": { en: "Disclaimer", ml: "പ്രധാന കുറിപ്പ്", ar: "إخلاء مسؤولية" },
+  "about.disclaimer_content": { en: "This tool is for educational purposes and to assist with calculations. It is not an official Fatwa. In doubtful matters, please consult a qualified scholar.", ml: "ഈ സൗകര്യം ഫിഖ്ഹ് പഠനത്തിനും, കണക്കുകൂട്ടലുകളിൽ സഹായിക്കുന്നതിനും വേണ്ടിയുള്ളതാണ്. ഇത് ഒരു ഔദ്യോഗിക ഫത്‌വയല്ല. സംശയകരമായ വിഷയങ്ങളിൽ യോഗ്യരായ പണ്ഡിതന്മാരുമായി ബന്ധപ്പെടുക.", ar: "هذه الأداة مخصصة للأغراض التعليمية والمساعدة في الحسابات. هي لا تعتبر فتوى شرعية رسمية. في المسائل المشكوك فيها، يرجى استشارة عالم مؤهل." }
 };
 
 export const t = (key: string, lang: Language, options?: Record<string, string | number>): string => {
