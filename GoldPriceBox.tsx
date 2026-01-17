@@ -1,8 +1,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { Coins, RefreshCcw } from 'lucide-react';
-import { GoldPrice, Language } from './types';
-import { fetchGoldPrice } from './services/goldApi';
+import { MetalPrices, Language } from './types';
+import { fetchMetalPrices } from './services/goldApi';
 import { t } from './services/translations';
 
 interface Props {
@@ -10,12 +10,12 @@ interface Props {
 }
 
 const GoldPriceBox: React.FC<Props> = ({ language }) => {
-  const [data, setData] = useState<GoldPrice | null>(null);
+  const [prices, setPrices] = useState<MetalPrices | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchGoldPrice().then(res => {
-      setData(res);
+    fetchMetalPrices().then(res => {
+      setPrices(res);
       setLoading(false);
     });
   }, []);
@@ -30,7 +30,7 @@ const GoldPriceBox: React.FC<Props> = ({ language }) => {
             <Coins className="text-amber-400" size={20} />
           </div>
           <div>
-            <h3 className="text-sm font-bold text-slate-100">{t('gold.price_title', language)}</h3>
+            <h3 className="text-sm font-bold text-slate-100">{t('metal.price_title', language)}</h3>
             <p className="text-[11px] text-slate-400 uppercase tracking-widest font-semibold">{t('gold.live_reference', language)}</p>
           </div>
         </div>
@@ -44,11 +44,25 @@ const GoldPriceBox: React.FC<Props> = ({ language }) => {
         )}
       </div>
       
-      <div className="flex items-baseline space-x-2 relative z-10">
-        <span className="text-3xl font-black text-white tracking-tight">
-          {loading ? '---' : `₹ ${data?.price.toLocaleString()}`}
-        </span>
-        <span className="text-sm text-slate-400 font-bold uppercase tracking-wider">{t('gold.per_gram', language)}</span>
+      <div className="grid grid-cols-2 gap-x-4">
+        <div className="border-e border-white/10 pe-4">
+            <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">{t('gold.price_title', language)}</h4>
+            <div className="flex items-baseline space-x-2 relative z-10 mt-2">
+              <span className="text-3xl font-black text-white tracking-tight">
+                {loading ? '---' : `₹ ${prices?.gold.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
+              </span>
+              <span className="text-sm text-slate-400 font-bold uppercase tracking-wider">{t('gold.per_gram', language)}</span>
+            </div>
+        </div>
+        <div>
+            <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">{t('silver.price_title', language)}</h4>
+            <div className="flex items-baseline space-x-2 relative z-10 mt-2">
+              <span className="text-3xl font-black text-white tracking-tight">
+                {loading ? '---' : `₹ ${prices?.silver.toLocaleString(undefined, { maximumFractionDigits: 2 })}`}
+              </span>
+              <span className="text-sm text-slate-400 font-bold uppercase tracking-wider">{t('gold.per_gram', language)}</span>
+            </div>
+        </div>
       </div>
       
       <div className="mt-4 pt-4 border-t border-white/5 text-[10px] text-slate-400 italic relative z-10">

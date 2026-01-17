@@ -83,14 +83,34 @@ export interface CalculationResult {
 }
 
 
-export interface GoldPrice {
-  price: number;
+// Metal Prices
+export interface MetalPrices {
+  gold: number;
+  silver: number;
 }
 
+// Zakah Calculation Inputs
 export interface ZakahInputs {
+  goldGrams: number;
+  silverGrams: number;
   cash: number;
-  goldWeight: number;
-  silverWeight: number;
-  businessAssets: number;
-  debts: number;
+  businessStock: number;
+  businessCash: number;
+  receivables: number;
+}
+
+// Zakah Calculation Result breakdown
+export interface ZakahResultItem {
+  eligible: boolean;
+  zakah: number;
+  zakatableValue: number;
+  nisabValue: number;
+}
+
+export interface ZakahResult {
+  gold: ZakahResultItem;
+  silver: ZakahResultItem;
+  cash: ZakahResultItem;
+  business: ZakahResultItem;
+  total: number;
 }

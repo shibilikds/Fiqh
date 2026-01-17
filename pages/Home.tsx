@@ -2,7 +2,6 @@
 import React from 'react';
 import { Calculator, Banknote, BookText, FileText, PieChart, Info, Scale, AlertTriangle } from 'lucide-react';
 import { Page, School, Language } from '../types';
-import GoldPriceBox from '../GoldPriceBox';
 import { t } from '../services/translations';
 
 interface HomeProps {
@@ -80,10 +79,6 @@ const Home: React.FC<HomeProps> = ({ setPage, school, language }) => {
         <p className="text-xs text-amber-200 leading-relaxed font-medium">
             {t('about.disclaimer_content', language)}
         </p>
-      </div>
-
-      <div className="max-w-2xl mx-auto w-full">
-        <GoldPriceBox language={language} />
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 lg:gap-6">

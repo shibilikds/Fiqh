@@ -1,15 +1,36 @@
-// Service to handle gold price data
-import { GoldPrice } from '../types';
+
+// Service to handle metal price data
+import { MetalPrices } from '../types';
 
 export const NISAB_GOLD_GRAMS = 85;
+export const NISAB_SILVER_GRAMS = 595;
 
-export const fetchGoldPrice = async (): Promise<GoldPrice> => {
-  // Simulating an API call to get live gold price in INR
-  // In a real implementation, this would call an external financial API
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      // Mocked price for demonstration (INR per gram of 24K gold)
-      resolve({ price: 6250 });
-    }, 500);
-  });
+// Using a reliable, public, key-less API from goldsilverprice.in for live metal prices in INR.
+const API_URL = 'https://api.goldsilverprice.in/v1/price';
+
+export const fetchMetalPrices = async (): Promise<MetalPrices> => {
+  try {
+    const response = await fetch(API_URL);
+    
+    if (!response.ok) {
+      console.error(`API request failed with status ${response.status}, using fallback values.`);
+      return { gold: 6250, silver: 80 }; // Fallback prices
+    }
+    
+    const data = await response.json();
+    
+    const goldPrice = data.gold_price_gram;
+    const silverPrice = data.silver_price_gram;
+    
+    if (typeof goldPrice !== 'number' || typeof silverPrice !== 'number') {
+        console.error('Invalid data format from metal price API, using fallback values.');
+        return { gold: 6250, silver: 80 };
+    }
+    
+    return { gold: goldPrice, silver: silverPrice };
+  } catch (error) {
+    console.error('Error fetching metal prices:', error);
+    // In case of a network error or other exception, return fallback prices.
+    return { gold: 6250, silver: 80 };
+  }
 };
