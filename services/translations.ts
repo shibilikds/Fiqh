@@ -30,7 +30,7 @@ const translations = {
 
   // Home Page
   "home.trial_notice_title": { en: "Notice", ml: "അറിയിപ്പ്", ar: "إشعار" },
-  "home.trial_notice_content": { en: "This website is currently in a trial period. Calculations and features are subject to change.", ml: "ഈ വെബ്സൈറ്റ് ഇപ്പോൾ പരീക്ഷണ (Trial) ഘട്ടത്തിലാണ്. കണക്കുകളിലും ഫീച്ചറുകളിലും മാറ്റങ്ങൾ ഉണ്ടാകാൻ സാധ്യതയുണ്ട്.", ar: "هذا الموقع حاليًا في فترة تجريبية. الحسابات والميزات قد تخضع للتغيير." },
+  "home.trial_notice_content": { en: "This website is currently in a trial period. Calculations and features are subject to change. If you notice any errors, please contact us via WhatsApp.", ml: "ഈ വെബ്സൈറ്റ് ഇപ്പോൾ പരീക്ഷണ (Trial) ഘട്ടത്തിലാണ്. കണക്കുകളിലും ഫീച്ചറുകളിലും മാറ്റങ്ങൾ ഉണ്ടാകാൻ സാധ്യതയുണ്ട്. തെറ്റുകൾ ശ്രദ്ധയിൽപ്പെട്ടാൽ വാട്സ്ആപ്പിൽ ബന്ധപ്പെടുക.", ar: "هذا الموقع حاليًا في فترة تجريبية. الحسابات والميزات قد تخضع للتغيير. إذا لاحظت أي أخطاء، يرجى التواصل معنا عبر الواتساب." },
   "home.title": { en: "Sunni Fiqh Hub", ml: "സുന്നി ഫിഖ്ഹ് ഹബ്", ar: "مركز الفقه السني" },
   "home.active_madhhab": { en: "Active: {schoolName} Madhhab", ml: "നിലവിൽ: {schoolName} മദ്ഹബ്", ar: "نشط: مذهب {schoolName}" },
   "home.card_inheritance_shares": { en: "Inheritance Shares", ml: "അനന്തരാവകാശ ഓഹരികൾ", ar: "حصص الميراث" },

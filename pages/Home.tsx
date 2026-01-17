@@ -60,6 +60,25 @@ const Home: React.FC<HomeProps> = ({ setPage, school, language }) => {
 
   return (
     <div className="space-y-8 lg:space-y-12 pb-10">
+      <section className="space-y-4">
+        {/* Trial Notice */}
+        <div className="bg-rose-600/10 p-5 rounded-2xl border border-rose-500/20 flex items-start gap-4">
+          <AlertTriangle className="text-rose-400 mt-1 shrink-0" size={20} />
+          <div>
+            <h3 className="text-xs font-black text-rose-300 uppercase tracking-widest">{t('home.trial_notice_title', language)}</h3>
+            <p className="text-slate-300 text-xs mt-1 leading-relaxed">{t('home.trial_notice_content', language)}</p>
+          </div>
+        </div>
+        {/* Disclaimer */}
+        <div className="bg-amber-600/10 p-5 rounded-2xl border border-amber-500/20 flex items-start gap-4">
+          <AlertTriangle className="text-amber-400 mt-1 shrink-0" size={20} />
+          <div>
+            <h3 className="text-xs font-black text-amber-300 uppercase tracking-widest">{t('about.disclaimer_title', language)}</h3>
+            <p className="text-slate-300 text-xs mt-1 leading-relaxed">{t('about.disclaimer_content', language)}</p>
+          </div>
+        </div>
+      </section>
+
       <section className="text-center py-4">
         <div className="inline-block p-6 bg-blue-500/10 rounded-[2rem] mb-6 border border-blue-400/20 shadow-[0_0_50px_rgba(59,130,246,0.2)]">
           <Scale className="text-blue-400" size={48} />
