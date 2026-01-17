@@ -1,8 +1,9 @@
 
 import React from 'react';
-import { Home, Calculator, BookOpen, BarChart3, Info, Wallet, Scale, ChevronDown, Languages, Moon } from 'lucide-react';
+import { Home, Calculator, BookOpen, BarChart3, Info, Wallet, Scale, ChevronDown, Languages, Moon, MessageCircle } from 'lucide-react';
 import { Page, School, Language } from '../types';
 import { t } from '../services/translations';
+import FloatingContact from './FloatingContact';
 
 
 interface LayoutProps {
@@ -115,6 +116,19 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPage, setPage, current
 
         <div className="h-20 lg:hidden" />
       </div>
+      
+      <FloatingContact currentLanguage={currentLanguage} />
+      
+      <a 
+        href="https://wa.me/919645015590"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Contact on WhatsApp"
+        className="fixed bottom-24 start-5 lg:bottom-5 z-40 w-14 h-14 lg:w-16 lg:h-16 bg-emerald-500 rounded-full flex items-center justify-center shadow-2xl shadow-emerald-500/30 hover:bg-emerald-400 transition-all duration-300 scale-100 hover:scale-110 active:scale-95 animate-in fade-in slide-in-from-bottom-5 duration-500"
+      >
+        <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping"></span>
+        <MessageCircle size={32} className="text-white relative" />
+      </a>
 
       <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-950/90 backdrop-blur-xl border-t border-white/10 flex justify-around items-center py-3 shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
         {navItems.map((item) => (

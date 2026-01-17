@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Info, Mail, Globe, ShieldCheck, Scale, GraduationCap, Code, Server, AlertTriangle } from 'lucide-react';
+import { Info, Mail, Globe, ShieldCheck, Scale, GraduationCap, Code, Server, AlertTriangle, MessageCircle } from 'lucide-react';
 import { Page, School, Language } from '../types';
 import { t } from '../services/translations';
 
@@ -65,13 +65,27 @@ const About: React.FC<Props> = ({ language }) => {
           {t('about.contact_desc', language)}
         </p>
         <div className="space-y-3">
-          <div className="flex items-center text-[10px] text-blue-400 font-black uppercase tracking-widest">
+          <div className="flex items-center text-[10px] text-slate-400 font-black uppercase tracking-widest">
             <Globe className="me-3" size={14} /> www.shafiifiqh.hub
           </div>
-          <div className="flex items-center text-[10px] text-blue-400 font-black uppercase tracking-widest">
+          <div className="flex items-center text-[10px] text-slate-400 font-black uppercase tracking-widest">
             <Mail className="me-3" size={14} /> desk@shafiifiqh.hub
           </div>
         </div>
+
+        <a 
+          href="https://wa.me/919645015590" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className="mt-5 block p-5 bg-emerald-600/20 rounded-2xl border-2 border-emerald-400/30 hover:bg-emerald-500/20 transition-all text-center group shadow-lg hover:shadow-emerald-500/10"
+        >
+          <div className="flex items-center justify-center">
+            <MessageCircle className="me-4 text-emerald-300 group-hover:scale-110 transition-transform" size={24} />
+            <span className="text-lg font-black text-white tracking-wider">
+              {t('about.contact_whatsapp', language)}
+            </span>
+          </div>
+        </a>
       </div>
 
       <div className="bg-amber-600/10 rounded-3xl p-6 border border-amber-400/20 shadow-xl">

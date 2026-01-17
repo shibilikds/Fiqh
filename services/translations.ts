@@ -24,8 +24,13 @@ const translations = {
   "layout.academic_mode": { en: "Academic Mode", ml: "അക്കാദമിക് മോഡ്", ar: "الوضع الأكاديمي" },
   "layout.madhhab_engine_note": { en: "Multi-Madhhab engine active. Rules change based on selection.", ml: "മൾട്ടി-മദ്ഹബ് എഞ്ചിൻ സജീവം. തിരഞ്ഞെടുപ്പ് അനുസരിച്ച് നിയമങ്ങൾ മാറും.", ar: "محرك المذاهب المتعددة نشط. تتغير القواعد بناءً على الاختيار." },
   "lang.switcher_label": { en: "Language", ml: "ഭാഷ", ar: "اللغة" },
-  
+  "contact.floating_title": { en: "Report an Issue?", ml: "പ്രശ്നങ്ങൾ അറിയിക്കാൻ?", ar: "للإبلاغ عن مشكلة؟" },
+  "contact.floating_desc": { en: "Contact us via WhatsApp to report issues or provide feedback.", ml: "പ്രശ്നങ്ങളോ നിർദ്ദേശങ്ങളോ അറിയിക്കാൻ വാട്സ്ആപ്പ് വഴി ബന്ധപ്പെടുക.", ar: "تواصل معنا عبر الواتساب للإبلاغ عن المشاكل أو تقديم الملاحظات." },
+  "contact.whatsapp_button": { en: "Contact on WhatsApp", ml: "വാട്സ്ആപ്പിൽ ബന്ധപ്പെടുക", ar: "تواصل عبر الواتساب" },
+
   // Home Page
+  "home.trial_notice_title": { en: "Notice", ml: "അറിയിപ്പ്", ar: "إشعار" },
+  "home.trial_notice_content": { en: "This website is currently in a trial period. Calculations and features are subject to change.", ml: "ഈ വെബ്സൈറ്റ് ഇപ്പോൾ പരീക്ഷണ (Trial) ഘട്ടത്തിലാണ്. കണക്കുകളിലും ഫീച്ചറുകളിലും മാറ്റങ്ങൾ ഉണ്ടാകാൻ സാധ്യതയുണ്ട്.", ar: "هذا الموقع حاليًا في فترة تجريبية. الحسابات والميزات قد تخضع للتغيير." },
   "home.title": { en: "Sunni Fiqh Hub", ml: "സുന്നി ഫിഖ്ഹ് ഹബ്", ar: "مركز الفقه السني" },
   "home.active_madhhab": { en: "Active: {schoolName} Madhhab", ml: "നിലവിൽ: {schoolName} മദ്ഹബ്", ar: "نشط: مذهب {schoolName}" },
   "home.card_inheritance_shares": { en: "Inheritance Shares", ml: "അനന്തരാവകാശ ഓഹരികൾ", ar: "حصص الميراث" },
@@ -252,6 +257,7 @@ const translations = {
   "about.content_desc": { en: "Educational modules decoupled into {file1} and {file2} for easy editorial updates.", ml: "എളുപ്പത്തിലുള്ള എഡിറ്റോറിയൽ അപ്‌ഡേറ്റുകൾക്കായി വിദ്യാഭ്യാസ മൊഡ്യൂളുകൾ {file1}, {file2} എന്നിവയിലേക്ക് വേർതിരിച്ചിരിക്കുന്നു.", ar: "تم فصل الوحدات التعليمية في {file1} و {file2} لتسهيل التحديثات التحريرية." },
   "about.contact_title": { en: "Contact & Support", ml: "ബന്ധപ്പെടാനും പിന്തുണയ്ക്കും", ar: "الاتصال والدعم" },
   "about.contact_desc": { en: "For academic clarifications or to report calculation edge-cases, please connect with our editorial team.", ml: "അക്കാദമിക് വ്യക്തതകൾക്കോ ​​കണക്കുകൂട്ടലുകളിലെ പിഴവുകൾ റിപ്പോർട്ട് ചെയ്യുന്നതിനോ, ദയവായി ഞങ്ങളുടെ എഡിറ്റോറിയൽ ടീമുമായി ബന്ധപ്പെടുക.", ar: "للاستيضاحات الأكاديمية أو للإبلاغ عن حالات حسابية نادرة، يرجى التواصل مع فريق التحرير لدينا." },
+  "about.contact_whatsapp": { en: "WhatsApp: +91 96450 15590", ml: "വാട്ട്സ്ആപ്പ്: +91 96450 15590", ar: "واتساب: +91 96450 15590" },
   "about.version": { en: "v1.2.0 • Madhhab Series", ml: "v1.2.0 • മദ്ഹബ് സീരീസ്", ar: "v1.2.0 • سلسلة المذاهب" },
   "about.disclaimer_title": { en: "Disclaimer", ml: "പ്രധാന കുറിപ്പ്", ar: "إخلاء مسؤولية" },
   "about.disclaimer_content": { en: "This tool is for educational purposes and to assist with calculations. It is not an official Fatwa. In doubtful matters, please consult a qualified scholar.", ml: "ഈ സൗകര്യം ഫിഖ്ഹ് പഠനത്തിനും, കണക്കുകൂട്ടലുകളിൽ സഹായിക്കുന്നതിനും വേണ്ടിയുള്ളതാണ്. ഇത് ഒരു ഔദ്യോഗിക ഫത്‌വയല്ല. സംശയകരമായ വിഷയങ്ങളിൽ യോഗ്യരായ പണ്ഡിതന്മാരുമായി ബന്ധപ്പെടുക.", ar: "هذه الأداة مخصصة للأغراض التعليمية والمساعدة في الحسابات. هي لا تعتبر فتوى شرعية رسمية. في المسائل المشكوك فيها، يرجى استشارة عالم مؤهل." }
